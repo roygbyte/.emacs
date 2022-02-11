@@ -1,4 +1,4 @@
-;;      _       _                                   
+;      _       _                                   
 ;;     | |     | |                                  
 ;;   __| | ___ | |_    ___ _ __ ___   __ _  ___ ___ 
 ;;  / _` |/ _ \| __|  / _ \ '_ ` _ \ / _` |/ __/ __|
@@ -85,23 +85,22 @@
                     :foreground "#161616"
                     :bold nil)
 
+(set-face-attribute 'mode-line nil
+                    :background "#333333")
+
 (set-face-attribute 'mode-line-inactive nil
                     :foreground "pink"
-                    :background "#161616")
+                    :background "#333333")
 
 (set-face-attribute 'cursor nil
                     :background "pink")
 
 (set-cursor-color "pink")
 
-(set-face-attribute 'mode-line nil
-                    :foreground "#161616"
-                    :background "pink")
-
 (set-face-background 'vertical-border "#161616")
 (set-face-foreground 'vertical-border (face-background 'vertical-border))
 (setq vertical-scroll-bar nil)
- 
+
 ;; =========================================
 ;; SECITON :: Usability Tweaks
 ;; :: Show line numbbers
@@ -115,13 +114,31 @@
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 
+;; :: Enable Smart Mode Line
+;;(setq sml/theme 'dark)
+(setq sml/override-theme nil)
+(sml/setup)
+
+;; :: Enable All The Icons
+;; Note: this doesn't work!
+(when (display-graphic-p)
+  (require 'all-the-icons))
+;; or
+(use-package all-the-icons
+  :if (display-graphic-p))
+
 ;; :: Highlight current line
 (global-hl-line-mode 1)
 (set-face-attribute 'hl-line nil
-                     :background "#161616")
+                     :background "#333333")
+
+;; :: Enable Autodim
+(add-hook 'after-init-hook (lambda ()
+  (when (fboundp 'auto-dim-other-buffers-mode)
+    (auto-dim-other-buffers-mode t))))
 
 ;; :: Enable Golden Ration screen resizing
-(golden-ratio-mode 1)
+(golden-ratio-mode 0)
 (setq golden-ratio-auto-scale t)
 
 ;; :: Enable active buffer switch with arrow keys
@@ -150,9 +167,24 @@
 ;; :: Show a clock
 (display-time)
 
+(defface egoge-display-time
+  '((((type x w32 mac))
+     ;; #060525 is the background colour of my default face.
+     (:foreground "#060525" :inherit bold))
+    (((type tty))
+     (:foreground "blue")))
+  "Face used to display the time in the mode line.")
+
+;; This causes the current time in the mode line to be displayed in
+;; `egoge-display-time-face' to make it stand out visually.
+(setq display-time-string-forms
+      '((propertize (concat day "/" dayname "/" monthname " - " 12-hours ":" minutes "" am-pm)
+ 		    'face 'egoge-display-time)))
+
 ;; :: Enable org fancy bullets
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
+(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 ;; :: Enable EditorConfig Mode
 ;;(editorconfig-mode 1)
 
@@ -424,14 +456,22 @@ This one changes the cursor color on each blink. Define colors in `blink-cursor-
    [default default default italic underline success warning error])
  '(ansi-color-names-vector
    ["#212337" "#ff757f" "#c3e88d" "#ffc777" "#82aaff" "#c099ff" "#b4f9f8" "#c8d3f5"])
+ '(auto-dim-other-buffers-dim-on-switch-to-minibuffer nil)
+ '(auto-dim-other-buffers-mode t)
  '(company-quickhelp-color-background "#4F4F4F")
  '(company-quickhelp-color-foreground "#DCDCCC")
  '(custom-enabled-themes (quote (doom-1337)))
  '(custom-safe-themes
    (quote
-    ("4133d2d6553fe5af2ce3f24b7267af475b5e839069ba0e5c80416aa28913e89a" "e19ac4ef0f028f503b1ccafa7c337021834ce0d1a2bca03fcebc1ef635776bea" "a9a67b318b7417adbedaab02f05fa679973e9718d9d26075c6235b1f0db703c8" "8146edab0de2007a99a2361041015331af706e7907de9d6a330a3493a541e5a6" "f302eb9c73ead648aecdc1236952b1ceb02a3e7fcd064073fb391c840ef84bca" "1f50a7274cd56f28713e1694600ec7b8f2fd1c7d2ef38c5e7378a26931605409" "8d7b028e7b7843ae00498f68fad28f3c6258eda0650fe7e17bfb017d51d0e2a2" "5aef652e40fa5f111e78997285f6e4c892112da0c2f919eb663baaa330a8521f" "d47f868fd34613bd1fc11721fe055f26fd163426a299d45ce69bef1f109e1e71" "c5ded9320a346146bbc2ead692f0c63be512747963257f18cc8518c5254b7bf5" "716f0a8a9370912d9e6659948c2cb139c164b57ef5fda0f337f0f77d47fe9073" "5f19cb23200e0ac301d42b880641128833067d341d22344806cdad48e6ec62f6" "1d44ec8ec6ec6e6be32f2f73edf398620bb721afeed50f75df6b12ccff0fbb15" "6c386d159853b0ee6695b45e64f598ed45bd67c47f671f69100817d7db64724d" "cf9414f229f6df728eb2a5a9420d760673cca404fee9910551caf9c91cff3bfa" "d7ee1fdb09a671a968b2a751746e5b3f5f26ac1fd475d95d094ee1e4ce446d58" "7a7b1d475b42c1a0b61f3b1d1225dd249ffa1abb1b7f726aec59ac7ca3bf4dae" "b89a4f5916c29a235d0600ad5a0849b1c50fab16c2c518e1d98f0412367e7f97" "c086fe46209696a2d01752c0216ed72fd6faeabaaaa40db9fc1518abebaf700d" "e6df46d5085fde0ad56a46ef69ebb388193080cc9819e2d6024c9c6e27388ba9" default)))
+    ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "4133d2d6553fe5af2ce3f24b7267af475b5e839069ba0e5c80416aa28913e89a" "e19ac4ef0f028f503b1ccafa7c337021834ce0d1a2bca03fcebc1ef635776bea" "a9a67b318b7417adbedaab02f05fa679973e9718d9d26075c6235b1f0db703c8" "8146edab0de2007a99a2361041015331af706e7907de9d6a330a3493a541e5a6" "f302eb9c73ead648aecdc1236952b1ceb02a3e7fcd064073fb391c840ef84bca" "1f50a7274cd56f28713e1694600ec7b8f2fd1c7d2ef38c5e7378a26931605409" "8d7b028e7b7843ae00498f68fad28f3c6258eda0650fe7e17bfb017d51d0e2a2" "5aef652e40fa5f111e78997285f6e4c892112da0c2f919eb663baaa330a8521f" "d47f868fd34613bd1fc11721fe055f26fd163426a299d45ce69bef1f109e1e71" "c5ded9320a346146bbc2ead692f0c63be512747963257f18cc8518c5254b7bf5" "716f0a8a9370912d9e6659948c2cb139c164b57ef5fda0f337f0f77d47fe9073" "5f19cb23200e0ac301d42b880641128833067d341d22344806cdad48e6ec62f6" "1d44ec8ec6ec6e6be32f2f73edf398620bb721afeed50f75df6b12ccff0fbb15" "6c386d159853b0ee6695b45e64f598ed45bd67c47f671f69100817d7db64724d" "cf9414f229f6df728eb2a5a9420d760673cca404fee9910551caf9c91cff3bfa" "d7ee1fdb09a671a968b2a751746e5b3f5f26ac1fd475d95d094ee1e4ce446d58" "7a7b1d475b42c1a0b61f3b1d1225dd249ffa1abb1b7f726aec59ac7ca3bf4dae" "b89a4f5916c29a235d0600ad5a0849b1c50fab16c2c518e1d98f0412367e7f97" "c086fe46209696a2d01752c0216ed72fd6faeabaaaa40db9fc1518abebaf700d" "e6df46d5085fde0ad56a46ef69ebb388193080cc9819e2d6024c9c6e27388ba9" default)))
+ '(display-time-day-and-date t)
+ '(display-time-default-load-average nil)
+ '(display-time-use-mail-icon nil)
  '(exwm-floating-border-color "#1e1e3f")
  '(fci-rule-color "#444a73")
+ '(helm-completion-style (quote helm))
+ '(helm-minibuffer-history-mode t)
+ '(helm-mode t)
  '(highlight-tail-colors
    ((("#2e3c4c" "#2e3c4c" "green")
      . 0)
@@ -449,10 +489,12 @@ This one changes the cursor color on each blink. Define colors in `blink-cursor-
     ("~/Windows/Notes/org/todo/issues.org" "~/Development/csv_to_org/todo.org" "~/Windows/Notes/org/todo/web_content.org" "~/Windows/Notes/org/todo/daily.org_archive" "~/Windows/Notes/org/todo/sage.org" "~/Windows/Notes/org/scrum/scrum.org" "~/Windows/Notes/org/todo/daily.org" "~/Windows/Notes/org/todo/default.org")))
  '(package-selected-packages
    (quote
-    (helm auto-dim-other-buffers golden-ratio geben yaml-mode exec-path-from-shell elpy markdown-mode melancholy-theme web-narrow-mode magit ox-epub htmlize editorconfig zenburn-theme haskell-mode use-package tron-legacy-theme spacemacs-theme doom-themes cyberpunk-theme)))
+    (rainbow-delimiters smart-mode-line all-the-icons-ibuffer all-the-icons-dired all-the-icons helm auto-dim-other-buffers golden-ratio geben yaml-mode exec-path-from-shell elpy markdown-mode melancholy-theme web-narrow-mode magit ox-epub htmlize editorconfig zenburn-theme haskell-mode use-package tron-legacy-theme spacemacs-theme doom-themes cyberpunk-theme)))
  '(pdf-view-midnight-colors (cons "#c8d3f5" "#212337"))
  '(rustic-ansi-faces
    ["#212337" "#ff757f" "#c3e88d" "#ffc777" "#82aaff" "#c099ff" "#b4f9f8" "#c8d3f5"])
+ '(sml/show-frame-identification nil)
+ '(sml/theme (quote dark))
  '(vc-annotate-background "#212337")
  '(vc-annotate-color-map
    (list
@@ -481,4 +523,13 @@ This one changes the cursor color on each blink. Define colors in `blink-cursor-
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(auto-dim-other-buffers-face ((t (:background "#161616"))))
+ '(helm-buffer-not-saved ((t (:foreground "color-118"))))
+ '(helm-buffer-saved-out ((t (:background "black" :foreground "color-118"))))
+ '(minibuffer-prompt ((t (:foreground "color-202"))))
+ '(sml/filename ((t (:inherit sml/global :foreground "pink" :weight bold))))
+ '(sml/git ((t (:foreground "color-202"))))
+ '(sml/global ((t (:foreground "#888888" :inverse-video nil))))
+ '(sml/prefix ((t (:inherit sml/global :foreground "#777777"))))
+ '(sml/time ((t (:inherit sml/modes :foreground "brightblue" :family "Ubuntu"))))
+ '(sml/vc ((t (:inherit sml/git :inverse-video t :overline t :underline nil :weight bold)))))
