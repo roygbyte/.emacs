@@ -1,4 +1,4 @@
-;      _       _                                   
+;;      _       _                                   
 ;;     | |     | |                                  
 ;;   __| | ___ | |_    ___ _ __ ___   __ _  ___ ___ 
 ;;  / _` |/ _ \| __|  / _ \ '_ ` _ \ / _` |/ __/ __|
@@ -30,6 +30,7 @@
 (require 'htmlize)
 (require 'web-mode)
 (require 'haskell-unicode-input-method)
+(require 'setup-ligatures)
 
 ;; (require 'eaf)
 ;; (require 'eaf-file-sender)
@@ -95,12 +96,33 @@
 (set-face-attribute 'cursor nil
                     :background "pink")
 
-(set-cursor-color "pink")
-
 (set-face-background 'vertical-border "#161616")
 (set-face-foreground 'vertical-border (face-background 'vertical-border))
 (setq vertical-scroll-bar nil)
 
+;; set Iosevka font only if it available
+(defun rag-set-face (frame)
+  "Configure faces on frame creation"
+  (select-frame frame)
+  (if (display-graphic)
+      (progn
+        (when (member "Iosevka" (font-family-list))
+          (progn
+            (set-frame-font "Iosevka" nil t))))))
+(add-hook 'after-make-frame-functions #'rag-set-face)
+
+(set-face-attribute 'default nil
+                    :family "Iosevka"
+                    :height 110)
+
+;;  
+
+;;set frame font when running emacs normally
+(when (member "Iosevka" (font-family-list))
+  (progn
+    (set-frame-font "Iosevka" nil t)))
+
+(set-face-attribute 'fringe nil :background nil)
 ;; =========================================
 ;; SECITON :: Usability Tweaks
 ;; :: Show line numbbers
@@ -135,7 +157,7 @@
 ;; :: Enable Autodim
 (add-hook 'after-init-hook (lambda ()
   (when (fboundp 'auto-dim-other-buffers-mode)
-    (auto-dim-other-buffers-mode t))))
+    (auto-dim-other-buffers-mode nil))))
 
 ;; :: Enable Golden Ration screen resizing
 (golden-ratio-mode 0)
@@ -165,21 +187,9 @@
 (transient-mark-mode 1)
 
 ;; :: Show a clock
-(display-time)
-
-(defface egoge-display-time
-  '((((type x w32 mac))
-     ;; #060525 is the background colour of my default face.
-     (:foreground "#060525" :inherit bold))
-    (((type tty))
-     (:foreground "blue")))
-  "Face used to display the time in the mode line.")
-
-;; This causes the current time in the mode line to be displayed in
-;; `egoge-display-time-face' to make it stand out visually.
 (setq display-time-string-forms
-      '((propertize (concat day "/" dayname "/" monthname " - " 12-hours ":" minutes "" am-pm)
- 		    'face 'egoge-display-time)))
+      '((propertize (concat day "/" dayname "/" monthname " - " 12-hours ":" minutes "" am-pm))))
+(display-time)
 
 ;; :: Enable org fancy bullets
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
@@ -469,6 +479,7 @@ This one changes the cursor color on each blink. Define colors in `blink-cursor-
  '(display-time-use-mail-icon nil)
  '(exwm-floating-border-color "#1e1e3f")
  '(fci-rule-color "#444a73")
+ '(fringe-mode 0 nil (fringe))
  '(helm-completion-style (quote helm))
  '(helm-minibuffer-history-mode t)
  '(helm-mode t)
@@ -524,12 +535,24 @@ This one changes the cursor color on each blink. Define colors in `blink-cursor-
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(auto-dim-other-buffers-face ((t (:background "#161616"))))
+ '(custom-comment ((t (:background "#282828" :foreground "#d4d4d4" :slant italic :family "Victor Mono"))))
+ '(font-lock-comment-face ((t (:foreground "#6D6D6D" :slant italic :width extra-condensed :family "Victor Mono"))))
+ '(font-lock-keyword-face ((t (:foreground "light slate blue" :weight bold))))
+ '(font-lock-string-face ((t (:background "#181818" :foreground "LightGoldenrod1"))))
  '(helm-buffer-not-saved ((t (:foreground "color-118"))))
  '(helm-buffer-saved-out ((t (:background "black" :foreground "color-118"))))
- '(minibuffer-prompt ((t (:foreground "color-202"))))
+ '(hl-line ((t (:background "#333333"))))
+ '(italic ((t (:slant italic :family "Victor Mono"))))
+ '(line-number ((t (:inherit default :background "#0a0a0a" :foreground "#333333" :strike-through nil :underline nil :slant normal :weight bold :height 0.8))))
+ '(line-number-current-line ((t (:inherit default :background "pink" :foreground "black" :strike-through nil :underline nil :slant normal :weight bold :height 0.8))))
+ '(minibuffer-prompt ((t (:background "black" :foreground "indian red" :inverse-video nil))))
+ '(mode-line ((t (:background "#0a0a0a" :foreground "gray60" :inverse-video nil :box nil :overline "pink"))))
+ '(mode-line-inactive ((t (:background "#0a0a0a" :foreground "gray60" :inverse-video nil :box nil))))
  '(sml/filename ((t (:inherit sml/global :foreground "pink" :weight bold))))
- '(sml/git ((t (:foreground "color-202"))))
+ '(sml/git ((t (:foreground "goldenrod1"))))
  '(sml/global ((t (:foreground "#888888" :inverse-video nil))))
+ '(sml/line-number ((t (:inherit sml/modes :weight extra-bold :height 0.8))))
  '(sml/prefix ((t (:inherit sml/global :foreground "#777777"))))
- '(sml/time ((t (:inherit sml/modes :foreground "brightblue" :family "Ubuntu"))))
- '(sml/vc ((t (:inherit sml/git :inverse-video t :overline t :underline nil :weight bold)))))
+ '(sml/time ((t (:inherit nil :distant-foreground "black" :foreground "honeydew" :weight extra-bold :height 0.9 :width ultra-condensed :family "Iosevka"))))
+ '(sml/vc ((t (:inherit sml/git :distant-foreground "#d4d4d4" :inverse-video nil :overline t :weight bold :height 1.0))))
+ '(vertical-border ((t nil))))
