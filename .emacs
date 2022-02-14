@@ -26,6 +26,8 @@
 (require 'org)
 (require 'org-bullets)
 (require 'setup-ligatures)
+(require 'frame-cmds)
+(require 'buffer-move)
 ;; :: Initialize packages.
 (package-initialize)
 (unless (package-installed-p 'use-package)
@@ -49,11 +51,13 @@
 (set-face-attribute 'default nil
                     :family "Iosevka Fixed SS05"                   
                     :height 110)
+
+(solaire-global-mode 1)
 ;; --------------------------------------
 ;; SUB SECTION :: Awesome Tray Mode
 ;; :: Enable Awesome tray mode, which is used to move the time display
 ;; :: to the mini-buffer.
-(awesome-tray-mode 1)
+(awesome-tray-mode -1)
 ;; :: This is my preferred way to see the date
 (defun awesome-tray-module-date-info()
   (format-time-string "%a/%b/%d %H:%M"))
@@ -68,6 +72,7 @@
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
+(toggle-frame-fullscreen)
 ;; :: Get rid of the scroll bar
 (setq vertical-scroll-bar nil)
 ;; :: Hide the fringe on the side of the frame
@@ -138,6 +143,7 @@
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 ;; :: Make org mode work with files ending in .
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+(setq truncate-lines nil)
 ;; :: Set hook on task completion: ask for note
 ;;(setq org-log-done 'note)
 ;; :: Set default todo file
@@ -393,7 +399,7 @@ This one changes the cursor color on each blink. Define colors in `blink-cursor-
  '(auto-dim-other-buffers-face ((t (:background "#161616"))))
  '(custom-comment ((t (:background "#282828" :foreground "#d4d4d4" :slant italic :family "Victor Mono"))))
  '(font-lock-builtin-face ((t (:foreground "spring green"))))
- '(font-lock-comment-face ((t (:foreground "#6D6D6D" :slant italic :width extra-condensed :family "Victor Mono"))))
+ '(font-lock-comment-face ((t (:foreground "hot pink" :slant italic :width extra-condensed :family "Victor Mono"))))
  '(font-lock-constant-face ((t (:foreground "salmon"))))
  '(font-lock-function-name-face ((t (:foreground "turquoise" :weight ultra-bold))))
  '(font-lock-keyword-face ((t (:foreground "light slate blue" :weight bold))))
