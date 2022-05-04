@@ -57,10 +57,10 @@
 ;; SUB SECTION :: Awesome Tray Mode
 ;; :: Enable Awesome tray mode, which is used to move the time display
 ;; :: to the mini-buffer.
-(awesome-tray-mode 1)
+(awesome-tray-mode -1)
 ;; :: This is my preferred way to see the date
 (defun awesome-tray-module-date-info()
-  (format-time-string "%a, %b %-d %H:%MM"))
+  (format-time-string "%a, %b %-d %H:%M"))
 ;; :: Override awesome-tray's other modules--just display time.
 (setq awesome-tray-active-modules
       '("date"))
@@ -75,9 +75,11 @@
 (toggle-frame-fullscreen)
 ;; :: Get rid of the scroll bar
 (setq vertical-scroll-bar nil)
-;; :: Hide the fringe on the side of the frame
-(fringe-mode 0)
+;; :: Show the fringe on the side of the frame
+(fringe-mode 1)
 (set-face-attribute 'fringe nil :background nil)
+;; :: Show Git differences in the fringe
+(global-diff-hl-mode 1)
 ;; :: Highlight the active parentheses
 (show-paren-mode 1)
 ;; :: Show line numbbers
@@ -119,6 +121,8 @@
   ;; Enables ligature checks globally in all buffers. You can also do it
   ;; per mode with `ligature-mode'.
   (global-ligature-mode t))
+;;(setq split-height-threshold nil)
+;;(setq split-width-threshold 80)
 
 ;; =======================================
 ;; SECTION :: Helm Mode
