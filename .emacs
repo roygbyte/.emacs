@@ -13,19 +13,19 @@
 ;; :: Add Melpa, Elpa, and local package locations.
 (add-to-list 'package-archives
 	     '("melpa" . "http://melpa.org/packages/") t)
-(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+;;(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 ;; Local packages are located in a directory called "lisp" which is located in same directory as this file.
 ;;(message (concat (expand-file-name (locate-dominating-file buffer-file-name ".emacs")) "lisp/"))
 (add-to-list 'load-path "/home/scarlett/Development/_Emacs/dotemacs/lisp/")
+;;(add-to-list 'load-path "/home/scarlett/.emacs.d/lisp/")
 ;; Require the local packages.
 (require 'awesome-tray)
 (require 'htmlize)
-;;(require 'web-mode)
+(require 'web-mode)
 (require 'haskell-unicode-input-method)
 (require 'package)
 (require 'org)
 (require 'org-bullets)
-(require 'setup-ligatures)
 (require 'frame-cmds)
 (require 'buffer-move)
 ;; :: Initialize packages.
@@ -57,10 +57,10 @@
 ;; SUB SECTION :: Awesome Tray Mode
 ;; :: Enable Awesome tray mode, which is used to move the time display
 ;; :: to the mini-buffer.
-(awesome-tray-mode -1)
+(awesome-tray-mode 1)
 ;; :: This is my preferred way to see the date
 (defun awesome-tray-module-date-info()
-  (format-time-string "%a/%b/%d %H:%M"))
+  (format-time-string "%a, %b %-d %H:%MM"))
 ;; :: Override awesome-tray's other modules--just display time.
 (setq awesome-tray-active-modules
       '("date"))
@@ -107,12 +107,27 @@
 ;; :: Make delimiters raindow colors
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 (rainbow-delimiters-mode 1)
+;; :: Add ligatures
+(use-package ligature
+  :load-path "/home/scarlett/Development/_Emacs/dotemacs/lisp/"
+  :config
+  ;; Enable all Iosevka ligatures in programming modes
+  (ligature-set-ligatures 'prog-mode '("<---" "<--"  "<<-" "<-" "->" "-->" "--->" "<->" "<-->" "<--->" "<---->" "<!--"
+                                       "<==" "<===" "<=" "=>" "=>>" "==>" "===>" ">=" "<=>" "<==>" "<===>" "<====>" "<!---"
+                                       "<~~" "<~" "~>" "~~>" "::" ":::" "==" "!=" "===" "!=="
+                                       ":=" ":-" ":+" "<*" "<*>" "*>" "<|" "<|>" "|>" "+:" "-:" "=:" "<******>" "++" "+++"))
+  ;; Enables ligature checks globally in all buffers. You can also do it
+  ;; per mode with `ligature-mode'.
+  (global-ligature-mode t))
+
 ;; =======================================
 ;; SECTION :: Helm Mode
 (helm-mode 1)
 (setq-default helm-M-x-fuzzy-match t)
-(global-set-key "\C-x\C-m" 'helm-M-x)
+(global-set-key "\M-x" 'helm-M-x)
 (global-set-key "\C-c\C-m" 'helm-M-x)
+(global-set-key "\C-x\C-f" 'helm-find-files) ;; replace emacs default finder
+(global-set-key (kbd "C-x b") 'helm-buffers-list)
 ;; Might want to play around with these functions later
 ;; (define-key evil-ex-map "b " 'helm-mini)
 ;; (define-key evil-ex-map "e" 'helm-find-files)
@@ -139,6 +154,7 @@
 (setq desktop-path '("~/.emacs.d/" "~" "."))
 ;; =========================================
 ;; SECTION :: Org Mode
+;; Troubleshootin': C-u M-x org-reload, if 'wrong number of arguments'
 ;; :: Enable org fancy bullets
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 ;; :: Make org mode work with files ending in .
@@ -195,6 +211,10 @@
 ;; :: Set Color coding for @ contexts
 ;; https://stackoverflow.com/questions/40876294/color-tags-based-on-regex-emacs-org-mode/40918994#40918994
 ;; :: Set agenda key bindings
+
+;; :: ORG ROAM
+;;(setq org-roam-directory (file-truename "~/org-roam"))
+;;(org-roam-db-autosync-mode)
 ;; =========================================
 ;; SECITON :: Web Mode
 
@@ -219,6 +239,7 @@
 ;;  (setq web-mode-comment-style 2)
   )
 (add-hook 'web-mode-hook  'my-web-mode-hook)
+(add-hook 'php-mode-hook 'flymake-php-load)
 (setq web-mode-engines-alist
       '(("php"    . "\\.phtml\\'")
         ("blade"  . "\\.blade\\."))
@@ -386,8 +407,12 @@ This one changes the cursor color on each blink. Define colors in `blink-cursor-
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(org-agenda-files
+   (quote
+    ("~/Windows/Notes/org/todo/daily.org" "~/Windows/Notes/org/todo/default.org")))
  '(package-selected-packages
-   '(solaire-mode rainbow-delimiters telephone-line helm-mode-manager use-package sml-modeline smart-mode-line lua-mode golden-ratio doom-themes all-the-icons))
+   (quote
+    (flymake-jshint typescript-mode org-roam edit-indirect flymake-php flymake-phpcs package-lint-flymake diff-hl git-gutter-fringe+ solaire-mode rainbow-delimiters telephone-line helm-mode-manager use-package sml-modeline smart-mode-line lua-mode golden-ratio doom-themes all-the-icons)))
  '(sml/show-frame-identification t))
 (put 'dired-find-alternate-file 'disabled nil)
 (custom-set-faces
@@ -395,7 +420,7 @@ This one changes the cursor color on each blink. Define colors in `blink-cursor-
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background "#191919" :foreground "honeydew" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 113 :width normal :foundry "UKWN" :family "Iosevka Fixed SS05"))))
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "#191919" :foreground "honeydew" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight light :height 113 :width normal :foundry "UKWN" :family "Iosevka Fixed SS05"))))
  '(auto-dim-other-buffers-face ((t (:background "#161616"))))
  '(custom-comment ((t (:background "#282828" :foreground "#d4d4d4" :slant italic :family "Victor Mono"))))
  '(font-lock-builtin-face ((t (:foreground "spring green"))))
@@ -404,7 +429,7 @@ This one changes the cursor color on each blink. Define colors in `blink-cursor-
  '(font-lock-function-name-face ((t (:foreground "turquoise" :weight ultra-bold))))
  '(font-lock-keyword-face ((t (:foreground "light slate blue" :weight bold))))
  '(font-lock-string-face ((t (:background "#121212" :foreground "LightGoldenrod1" :slant italic :width ultra-condensed :family "Victor Mono"))))
- '(font-lock-variable-name-face ((t (:foreground "thistle"))))
+ '(font-lock-variable-name-face ((t (:foreground "green yellow"))))
  '(fringe ((t (:inherit default :foreground "#4b474c"))))
  '(helm-buffer-not-saved ((t (:foreground "color-118"))))
  '(helm-buffer-saved-out ((t (:background "black" :foreground "color-118"))))
@@ -412,6 +437,7 @@ This one changes the cursor color on each blink. Define colors in `blink-cursor-
  '(italic ((t (:slant italic :family "Victor Mono"))))
  '(line-number ((t (:inherit default :background "#0a0a0a" :foreground "#333333" :strike-through nil :underline nil :slant normal :weight bold :height 0.8))))
  '(line-number-current-line ((t (:inherit default :background "aquamarine" :foreground "medium slate blue" :strike-through nil :underline nil :slant normal :weight bold :height 0.8))))
+ '(markdown-header-face ((t (:inherit bold :foreground "green yellow" :height 1.1))))
  '(minibuffer-prompt ((t (:background "#161616" :foreground "LightGoldenrod1" :inverse-video nil))))
  '(mode-line ((t (:background "medium slate blue" :foreground "pink" :box nil :height 1.0))))
  '(mode-line-inactive ((t (:background "#0a0a0a" :foreground "gray60" :inverse-video nil :box nil :height 1.0))))
@@ -424,6 +450,8 @@ This one changes the cursor color on each blink. Define colors in `blink-cursor-
  '(sml/time ((t (:inherit nil :distant-foreground "black" :foreground "#999999" :weight extra-bold :height 0.9 :width ultra-condensed :family "Iosevka Fixed SS05"))))
  '(sml/vc ((t (:inherit sml/git :distant-foreground "#d4d4d4" :inverse-video nil :overline t :weight bold :height 1.0))))
  '(solaire-default-face ((t (:inherit default :background "#0a0a0a"))))
- '(telephone-line-accent-active ((t (:background "aquamarine" :foreground "medium slate blue" :slant italic :weight extra-bold :width ultra-condensed :family "Victor Mono"))))
+ '(telephone-line-accent-active ((t (:background "aquamarine" :foreground "medium slate blue" :weight bold :width ultra-condensed :family "Iosevka"))))
  '(telephone-line-accent-inactive ((t (:background "#0a0a0a" :foreground "#d4d4d4"))))
- '(vertical-border ((t nil))))
+ '(vertical-border ((t nil)))
+ '(web-mode-keyword-face ((t (:foreground "medium slate blue"))))
+ '(web-mode-string-face ((t (:inherit font-lock-string-face :foreground "#FBE3BF")))))

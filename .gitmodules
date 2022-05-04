@@ -1,0 +1,6 @@
+[submodule "lisp/org-modern"]
+	path = lisp/org-modern
+	url = git@github.com:minad/org-modern.git
+[submodule "lisp/awesome-tray"]
+	path = lisp/awesome-tray
+	url = https://github.com/manateelazycat/awesome-tray.git
