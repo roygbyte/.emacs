@@ -1,0 +1,93 @@
+# -*- org-insert-tilde-language: emacs-lisp; -*-
+
+#+begin_src emacs-lisp
+  (require 'hydra)
+  (require 'pretty-hydra)
+
+  ;; https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325
+  (defun with-octicon (icon str &optional height v-adjust)
+    (s-concat (all-the-icons-octicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
+  (defun with-faicon (icon str &optional height v-adjust)
+    (s-concat (all-the-icons-faicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
+
+  ;;(org-roam-find-file (concat ,project " ") completions filter-nf no-confirm)
+
+  (defvar org-roam-launcher--title (with-octicon "book" "Dun Org-roamin'" 1 -0.05))
+  (pretty-hydra-define org-roam-launcher (:color pink :title org-roam-launcher--title :separator "━" :quit-key "q")
+    ("Capture and find"
+     (("c c" org-roam-capture "capture node")
+      ("c d" org-roam-dailies-capture-today "capture today")
+      ("f" org-roam-node-find "find")
+      ("i" org-roam-node-insert "insert"))
+     "Tags"
+     (("t a" org-roam-tag-add "add")
+      ("t r" org-roam-tag-remove "remove"))
+     "Dailies"
+     (("d t" org-roam-dailies-goto-today "goto today")
+      ("d y" org-roam-dailies-goto-yesterday "goto yesterday"))
+     ))
+  (global-set-key (kbd "C-c r") 'org-roam-launcher/body)
+
+  ;; https://github.com/jerrypnz/major-mode-hydra.el#pretty-hydra-define
+  (defvar jp-toggles--title (with-faicon "toggle-on" "Toggles" 1 -0.05))
+
+  (pretty-hydra-define jp-toggles
+    (:color amaranth :quit-key "q" :title jp-toggles--title)
+    ("Basic"
+     (("n" linum-mode "line number" :toggle t)
+      ("w" whitespace-mode "whitespace" :toggle t)
+      ("W" whitespace-cleanup-mode "whitespace cleanup" :toggle t)
+      ("r" rainbow-mode "rainbow" :toggle t)
+      ("L" page-break-lines-mode "page break lines" :toggle t))
+     "Highlight"
+     (("s" symbol-overlay-mode "symbol" :toggle t)
+      ("l" hl-line-mode "line" :toggle t)
+      ("x" highlight-sexp-mode "sexp" :toggle t)
+      ("t" hl-todo-mode "todo" :toggle t))
+     "UI"
+     (;;("d" jp-themes-toggle-light-dark "dark theme" :toggle jp-current-theme-dark-p)
+      ("z" zone "zone" :toggle t)
+      ("F" toggle-frame-fullscreen "fullsreen" :toggle t))
+     "Coding"
+     (("p" smartparens-mode "smartparens" :toggle t)
+      ("P" smartparens-strict-mode "smartparens strict" :toggle t)
+      ("S" show-smartparens-mode "show smartparens" :toggle t)
+      ("f" flycheck-mode "flycheck" :toggle t))
+     "Emacs"
+     (("D" toggle-debug-on-error "debug on error" :toggle (default-value 'debug-on-error))
+      ("X" toggle-debug-on-quit "debug on quit" :toggle (default-value 'debug-on-quit)))))
+  (global-set-key (kbd "C-c t") 'jp-toggles/body)
+
+  ;; This is the hydra we can call upon when feeling bored, tired, understimulated, etc.
+  ;; It will include a few activities that may be helpful (?) as stones stepping towards
+  ;; recognition of said boredom. Maybe a 15 minute timer?
+  ;; - Artist mode to create a new drawing in a folder
+  ;; - 
+  (defhydra hydra-bored (:color blue)
+    "Launch"
+    ("1" (browse-url "http://www.reddit.com/r/emacs/") "reddit" :column "More focus-mana")
+    ("2" org-roam-capture 1 "write" :column "More focus-mana")
+    ("3" (browse-url "http://www.emacswiki.org/") "emacswiki" :column "Less focus-mana")
+    ("q" nil "cancel"))
+  (global-set-key (kbd "M-2") 'hydra-bored/body)
+
+  (pretty-hydra-define hydra-tab-bar (:color blue :quit-key "q")
+    ("Keeping tabs"
+     (("b" tab-previous "Previous tab")
+      ("f" tab-next "Next tab")
+      ("r" tab-bar-rename-tab "Rename tab")
+      ("n" tab-bar-new-tab "New tab")
+      ("m" switch-buffer-to-other-tab "Switch buffer to other tab"))))
+  (global-set-key (kbd "C-x t") 'hydra-tab-bar/body)
+
+    (pretty-hydra-define hydra-buffer-move (:color blue :quit-key "q")
+    ("Current buffer"
+     (("<up>" buf-move-up "Move up")
+      ("<down>" buf-move-down "Move down")
+      ("<left>" buf-move-left "Move left")
+      ("<right>" buf-move-right "Move right")
+      )))
+  (global-set-key (kbd "M-1") 'hydra-buffer-move/body)
+#+end_src
+
+

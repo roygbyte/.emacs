@@ -1,6 +1,6 @@
-;;      _       _                                   
+ ;;      _       _                                   
 ;;     | |     | |                                  
-;;   __| | ___ | |_    ___ _ __ ___   __ _  ___ ___ 
+;;   __| | ___ | |_    ___ _ __ ___   __ _  ___ ___
 ;;  / _` |/ _ \| __|  / _ \ '_ ` _ \ / _` |/ __/ __|
 ;; | (_| | (_) | |_  |  __/ | | | | | (_| | (__\__ \
 ;;  \__,_|\___/ \__|  \___|_| |_| |_|\__,_|\___|___/
@@ -24,10 +24,15 @@
 (require 'web-mode)
 (require 'haskell-unicode-input-method)
 (require 'package)
-(require 'org)
+;;(require 'org)
+;;(require 'ligature)
 (require 'org-bullets)
 (require 'frame-cmds)
 (require 'buffer-move)
+(require 'dired+)
+(require 'smartparens-config)
+(require 'all-the-icons)
+(require 'org-modern)
 ;; :: Initialize packages.
 (package-initialize)
 (unless (package-installed-p 'use-package)
@@ -49,50 +54,68 @@
 ;; :: Use Iosevka as the default font. Victor Mono is also used (for comments), but that's
 ;; :: configured in `customize-face`.
 (set-face-attribute 'default nil
-                    :family "Iosevka Fixed SS05"                   
+                    :family "Iosevka Fixed"
                     :height 110)
 
 (solaire-global-mode 1)
+
+
+;; Tab bar ? What is this
+(add-to-list 'tab-bar-format 'tab-bar-format-align-right t)
+(add-to-list 'tab-bar-format 'tab-bar-format-global t)
+(display-time-mode)
+;;(add-to-list 'tab-bar-format 'display-time-mode t)
+(tab-bar-mode 1)
 ;; --------------------------------------
 ;; SUB SECTION :: Awesome Tray Mode
 ;; :: Enable Awesome tray mode, which is used to move the time display
 ;; :: to the mini-buffer.
-(awesome-tray-mode -1)
-;; :: This is my preferred way to see the date
-(defun awesome-tray-module-date-info()
-  (format-time-string "%a, %b %-d %H:%M"))
-;; :: Override awesome-tray's other modules--just display time.
-(setq awesome-tray-active-modules
-      '("date"))
+;; (awesome-tray-mode 1)
+;; ;; :: This is my preferred way to see the date
+;; (defun awesome-tray-module-date-info()
+;;   (format-time-string "%a, %b %-d %H:%M"))
+;; ;; :: Override awesome-tray's other modules--just display time.
+;; (setq awesome-tray-active-modules
+;;       '("date"))
 ;; --------------------------------------
 ;; SUB SECTION :: Miscellaneous tweaks
 ;; :: Disable splash screen
 (setq inhibit-splash-screen t)
 ;; :: Hide the menubar, scrollbar, toolbar, and modeline
+(toggle-frame-fullscreen)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
-(toggle-frame-fullscreen)
 ;; :: Get rid of the scroll bar
 (setq vertical-scroll-bar nil)
 ;; :: Show the fringe on the side of the frame
+(setq-default left-margin-width nil right-margin-width nil)
+(set-window-buffer nil (current-buffer))
+(setq fringes-outside-margins t)
+(window-divider-mode)
+
 (fringe-mode 1)
+(set-fringe-style '(12 . 12))
 (set-face-attribute 'fringe nil :background nil)
 ;; :: Show Git differences in the fringe
 (global-diff-hl-mode 1)
+(diff-hl-margin-mode)
+(diff-hl-flydiff-mode)
 ;; :: Highlight the active parentheses
 (show-paren-mode 1)
 ;; :: Show line numbbers
-(when (version<= "26.0.50" emacs-version )
-  (global-display-line-numbers-mode))
+;;(when (version<= "26.0.50" emacs-version )
+;;  (global-display-line-numbers-mode))
 ;; :: Highlight current line
 (global-hl-line-mode 1)
 (set-face-attribute 'hl-line nil
                      :background "#333333")
 ;; :: Remove the time display
-(display-time-mode -1)
+;;(display-time-mode -1)
 ;; :: Enable transient mark mode
 (transient-mark-mode 1)
+;; :: Enable icons in dired mode
+(add-hook 'dired-mode-hook #'all-the-icons-dired-mode)
 ;; :: Enable telephone-line-mode, which makes the mode bar fancy.
 (setq telephone-line-lhs
       '((evil   . (telephone-line-evil-tag-segment))
@@ -123,6 +146,13 @@
   (global-ligature-mode t))
 ;;(setq split-height-threshold nil)
 ;;(setq split-width-threshold 80)
+;; =======================================
+;; SECTION :: Elisp mode
+
+;; (add-hook 'emacs-lisp-mode-hook (lambda ()
+;;                                   (smartparens-mode)
+;;                                   (smartparens-strict-mode t)
+;;                                   )
 
 ;; =======================================
 ;; SECTION :: Helm Mode
@@ -160,7 +190,15 @@
 ;; SECTION :: Org Mode
 ;; Troubleshootin': C-u M-x org-reload, if 'wrong number of arguments'
 ;; :: Enable org fancy bullets
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+;;(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+(global-org-modern-mode 1)
+(setq org-modern-todo-faces
+      (quote (("DO" :background "green"
+               :foreground "black")
+              ("WAIT" :background "yellow"
+               :foreground "black"))))
+
 ;; :: Make org mode work with files ending in .
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
 (setq truncate-lines nil)
@@ -171,9 +209,32 @@
 ;; :: Set Todo keywords
 ;;(setq org-todo-keywords
 ;;      '((sequence "TODO" "WAIT" "VERIFY" "|" "DONE" "DELEGATED")))
-(setq org-todo-keyword-faces
- '(("IN-PROGRESS" . "orange") ("WAIT" . "yellow") ("CANCELED" . "red") ("DO" . "green"))
- )
+;;(setq org-todo-keyword-faces
+;; '(("IN-PROGRESS" . "orange") ("WAIT" . "yellow") ("CANCELED" . "red") ("DO" . "green"))
+;; )
+
+(setq
+ ;; Edit settings
+ org-auto-align-tags nil
+ org-tags-column 0
+ org-catch-invisible-edits 'show-and-error
+ org-special-ctrl-a/e t
+ org-insert-heading-respect-content t
+
+ ;; Org styling, hide markup etc.
+ org-hide-emphasis-markers t
+ org-pretty-entities t
+ org-ellipsis "…"
+
+ ;; Agenda styling
+ org-agenda-block-separator ?─
+ org-agenda-time-grid
+ '((daily today require-timed)
+   (800 1000 1200 1400 1600 1800 2000)
+   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+ org-agenda-current-time-string
+ "⭠ now ─────────────────────────────────────────────────")
+
 ;; Set timestamp on TODO create
 ;;(setq org-treat-insert-todo-heading-as-state-change t)
 (defun my/log-todo-creation-date (&rest ignore)
@@ -217,9 +278,186 @@
 ;; :: Set agenda key bindings
 
 ;; :: ORG ROAM
-;;(setq org-roam-directory (file-truename "~/org-roam"))
-;;(org-roam-db-autosync-mode)
-;; =========================================
+;;(setq org-roam-directory (file-truename "~/Dropbox/org"))
+
+;; (use-package org-roam
+;;   :custom
+;;   (org-roam-directory "~/Dropbox/org/")
+;;   
+;;   (org-roam-capture-templates
+;;    '(("d" "default" plain
+;;       #'org-roam-capture--get-point "%?"
+;;       :target (file+head "pages/${slug}.org"
+;;                          "#+title: ${title}\n")
+;;       :unnarrowed t))))
+;; (org-roam-setup)
+
+;; ==================================
+;; Org-roam mode!
+
+(defun roygbyte/org-roam-tia--entry ()
+  (prog1 (concat "* Today I Achieved: %? \n"
+          ":PROPERTIES:\n"
+          ;; Add file tags
+          ":END:\n")))
+
+          ;; (concat ":ID: " (org-id-new) "\n")
+
+(org-roam-db-autosync-mode t)
+(use-package org-roam 
+    :ensure t 
+    :init 
+    (setq org-roam-v2-ack t) 
+    :custom 
+    (setq org-roam-directory "~/Dropbox/org")
+    (setq org-roam-dailies-directory "journals/")
+    (setq org-roam-completion-system 'helm)
+    (setq org-roam-complete-everywhere t)
+    (setq org-roam-node-display-template ;; Rollback org-roam find behavior to show tags
+          (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+    (setq org-roam-capture-templates
+      '(
+        ("d" "default" plain "%?"
+         :target (file+head "pages/${slug}.org" ;; add .gpg for encryption!
+                            "#+title: ${title}\n")
+         :unnarrowed t)
+        ("e" "encrypted" plain "%?"
+         :target (file+head "pages/${slug}.org.gpg" ;; add .gpg for encryption!
+                            "#+title: ${title}\n")
+         :unnarrowed t)))
+    (setq org-roam-dailies-capture-templates
+          '(("d" "default" entry "* %<%I:%M %p>: %?"
+             :if-new (file+head "%<%Y_%m_%d>.org" "#+title: %<%Y-%m-%d>\n"))
+            ("t" "tia!" entry "* Today I Achieved: %? \n:PROPERTIES:\n:END:\n"
+             :if-new (file+head "%<%Y_%m_%d>.org" (concat "#+title: %<%Y-%m-%d>\n" roygbyte/org-roam-tia--entry)))))
+    )
+
+;; So the issue with my template is that the template string passed to the ... template (?) needs to be a file
+
+(org-roam-setup)
+
+;;(setq org-roam-dailies-directory "journals/")
+
+;; Add tags to the org roam find
+;; https://emacs.stackexchange.com/questions/70552/tag-column-for-filetag-in-org-roam-node-list-is-is-gone/70560#
+
+
+;; (defmacro go-roam-find-file-project-fn (project)
+;;   "Define a function to find an `org-roam' file within the given PROJECT."
+;;   (let* ((fn-name (intern (concat "go-roam-find-" (replace-regexp-in-string " +" "-" project))))
+;;          (docstring (concat "Find an `org-roam' file for: " project)))
+;;     `(defun ,fn-name (&optional completions filter-nf no-confirm)
+;;        ,docstring
+;;        (interactive)
+;;        (org-roam-find-file (concat ,project " ") completions filter-nf no-confirm))))
+
+
+
+;; (go-roam-find-file-project-fn "thel-sector")
+;; (go-roam-find-file-project-fn "ardu")
+;; (go-roam-find-file-project-fn "permanent bibliographies")
+;; (go-roam-find-file-project-fn "permanent cards")
+;; (go-roam-find-file-project-fn "hesburgh-libraries")
+;; (go-roam-find-file-project-fn "samvera")
+
+;; (defvar jnf-find-file-in-roam-project--title (with-octicon "book" "Find File in Roam Project" 1 -0.05))
+;; (pretty-hydra-define jnf-find-file-in-roam-project (:foreign-keys warn :title jnf-find-file-in-roam-project--title :quit-key "q")
+;;   (
+;;    "Permanent"
+;;    (("b" go-roam-find-permanent-bibliographies "Bibliography")
+;;     ("c" go-roam-find-permanent-cards "Card"))
+;;    "RPGs"
+;;    (("a" go-roam-find-ardu "Ardu, World of")
+;;     ("t" go-roam-find-thel-sector "Thel Sector"))
+;;    "Work"
+;;    (("h" go-roam-find-hesburgh-libraries "Hesburgh Libraries")
+;;     ("s" go-roam-find-samvera "Samvera"))
+
+;;    ))
+;; (global-set-key (kbd "M-1") 'jnf-find-file-in-roam-project/body)
+
+;; Hydra config
+(require 'hydra)
+(require 'pretty-hydra)
+
+;; https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325
+(defun with-octicon (icon str &optional height v-adjust)
+  (s-concat (all-the-icons-octicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
+(defun with-faicon (icon str &optional height v-adjust)
+  (s-concat (all-the-icons-faicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
+
+
+;;(org-roam-find-file (concat ,project " ") completions filter-nf no-confirm)
+
+(defvar org-roam-launcher--title (with-octicon "book" "Dun Org-roamin'" 1 -0.05))
+(pretty-hydra-define org-roam-launcher (:color pink :title org-roam-launcher--title :separator "━" :quit-key "q")
+   ("Capture and find"
+    (("c c" org-roam-capture "capture node")
+     ("c d" org-roam-dailies-capture-today "capture today")
+     ("f" org-roam-node-find "find")
+     ("i" org-roam-node-insert "insert"))
+    "Tags"
+    (("t a" org-roam-tag-add "add")
+     ("t r" org-roam-tag-remove "remove"))
+    "Dailies"
+    (("d t" org-roam-dailies-goto-today "goto today")
+     ("d y" org-roam-dailies-goto-yesterday "goto yesterday"))
+   ))
+(global-set-key (kbd "C-c r") 'org-roam-launcher/body)
+
+;; https://github.com/jerrypnz/major-mode-hydra.el#pretty-hydra-define
+(defvar jp-toggles--title (with-faicon "toggle-on" "Toggles" 1 -0.05))
+
+(pretty-hydra-define jp-toggles
+  (:color amaranth :quit-key "q" :title jp-toggles--title)
+  ("Basic"
+   (("n" linum-mode "line number" :toggle t)
+    ("w" whitespace-mode "whitespace" :toggle t)
+    ("W" whitespace-cleanup-mode "whitespace cleanup" :toggle t)
+    ("r" rainbow-mode "rainbow" :toggle t)
+    ("L" page-break-lines-mode "page break lines" :toggle t))
+   "Highlight"
+   (("s" symbol-overlay-mode "symbol" :toggle t)
+    ("l" hl-line-mode "line" :toggle t)
+    ("x" highlight-sexp-mode "sexp" :toggle t)
+    ("t" hl-todo-mode "todo" :toggle t))
+   "UI"
+   (;;("d" jp-themes-toggle-light-dark "dark theme" :toggle jp-current-theme-dark-p)
+    ("z" zone "zone" :toggle t)
+    ("F" toggle-frame-fullscreen "fullsreen" :toggle t))
+   "Coding"
+   (("p" smartparens-mode "smartparens" :toggle t)
+    ("P" smartparens-strict-mode "smartparens strict" :toggle t)
+    ("S" show-smartparens-mode "show smartparens" :toggle t)
+    ("f" flycheck-mode "flycheck" :toggle t))
+   "Emacs"
+   (("D" toggle-debug-on-error "debug on error" :toggle (default-value 'debug-on-error))
+    ("X" toggle-debug-on-quit "debug on quit" :toggle (default-value 'debug-on-quit)))))
+(global-set-key (kbd "C-c t") 'jp-toggles/body)
+
+;; This is the hydra we can call upon when feeling bored, tired, understimulated, etc.
+;; It will include a few activities that may be helpful (?) as stones stepping towards
+;; recognition of said boredom. Maybe a 15 minute timer?
+;; - Artist mode to create a new drawing in a folder
+;; - 
+(defhydra hydra-bored (:color blue)
+   "Launch"
+   ("1" (browse-url "http://www.reddit.com/r/emacs/") "reddit" :column "More focus-mana")
+   ("2" org-roam-capture 1 "write" :column "More focus-mana")
+   ("3" (browse-url "http://www.emacswiki.org/") "emacswiki" :column "Less focus-mana")
+   ("q" nil "cancel"))
+(global-set-key (kbd "M-2") 'hydra-bored/body)
+
+(pretty-hydra-define hydra-tab-bar (:color blue :quit-key "q")
+   ("Keeping tabs"
+    (("b" tab-previous "Previous tab")
+     ("f" tab-next "Next tab")
+     ("r" tab-bar-rename-tab "Rename tab")
+     ("n" tab-bar-new-tab "New tab")
+     ("m" switch-buffer-to-other-tab "Switch buffer to other tab"))))
+(global-set-key (kbd "C-x t") 'hydra-tab-bar/body)
+
+;; ==========================================
 ;; SECITON :: Web Mode
 
 ;; :: Set web mode hooks (PHP, HTML)
@@ -235,15 +473,20 @@
 (add-to-list 'auto-mode-alist '("\\.html\\.twig\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+(setq display-fill-column-indicator-character ".")
+(setq fci-dash-pattern 0.25)
+(setq fci-rule-use-dashes t)
 (defun my-web-mode-hook ()
   "Hooks for Web mode."
 ;;  (setq web-mode-markup-indent-offset 2)
 ;;  (setq web-mode-code-indent-offset 2)
 ;;  (setq web-mode-css-indent-offset 2)
-;;  (setq web-mode-comment-style 2)
+  ;;  (setq web-mode-comment-style 2)
+  (display-fill-column-indicator-mode)
+  (flymake-php-load)
   )
-(add-hook 'web-mode-hook  'my-web-mode-hook)
-(add-hook 'php-mode-hook 'flymake-php-load)
+(add-hook 'web-mode-hook #'my-web-mode-hook)
+;;(add-hook 'php-mode-hook #'flymake-php-load)
 (setq web-mode-engines-alist
       '(("php"    . "\\.phtml\\'")
         ("blade"  . "\\.blade\\."))
@@ -320,12 +563,17 @@ This one changes the cursor color on each blink. Define colors in `blink-cursor-
 (global-set-key (kbd "C-<") 'beginning-of-buffer)
 (global-set-key (kbd "C->") 'end-of-buffer)
 ;; :: Enable active buffer switch with arrow keys.
-(when (fboundp 'windmove-default-keybindings)
-  (windmove-default-keybindings))
-(windmove-default-keybindings)
+;; (when (fboundp 'windmove-default-keybindings)
+;;   (windmove-default-keybindings))
+;; (windmove-default-keybindings)
+(global-set-key (kbd "C-S-<up>") 'windmove-up)
+(global-set-key (kbd "C-S-<down>") 'windmove-down)
+(global-set-key (kbd "C-S-<left>") 'windmove-left)
+(global-set-key (kbd "C-S-<right>") 'windmove-right)
+
 ;; :: Setup hotkeys for windows scrolling other window.
-(define-key global-map [(meta up)] '(lambda() (interactive) (scroll-other-window -1)))
-(define-key global-map [(meta down)] '(lambda() (interactive) (scroll-other-window 1)))
+;;(define-key global-map [(meta up)] '(lambda() (interactive) (scroll-other-window -1)))
+;;(define-key global-map [(meta down)] '(lambda() (interactive) (scroll-other-window 1)))
 ;; :: Enable handy keybind for new line.
 (defun newline-without-break-of-line ()
   (interactive)
@@ -405,57 +653,3 @@ This one changes the cursor color on each blink. Define colors in `blink-cursor-
 ;;(editorconfig-mode 1)
 
 ;; https://www.emacswiki.org/emacs/DesktopMultipleSaveFiles
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(org-agenda-files
-   (quote
-    ("~/Windows/Notes/org/todo/daily.org" "~/Windows/Notes/org/todo/default.org")))
- '(package-selected-packages
-   (quote
-    (flymake-jshint typescript-mode org-roam edit-indirect flymake-php flymake-phpcs package-lint-flymake diff-hl git-gutter-fringe+ solaire-mode rainbow-delimiters telephone-line helm-mode-manager use-package sml-modeline smart-mode-line lua-mode golden-ratio doom-themes all-the-icons)))
- '(sml/show-frame-identification t))
-(put 'dired-find-alternate-file 'disabled nil)
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background "#191919" :foreground "honeydew" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight light :height 113 :width normal :foundry "UKWN" :family "Iosevka Fixed SS05"))))
- '(auto-dim-other-buffers-face ((t (:background "#161616"))))
- '(custom-comment ((t (:background "#282828" :foreground "#d4d4d4" :slant italic :family "Victor Mono"))))
- '(font-lock-builtin-face ((t (:foreground "spring green"))))
- '(font-lock-comment-face ((t (:foreground "hot pink" :slant italic :width extra-condensed :family "Victor Mono"))))
- '(font-lock-constant-face ((t (:foreground "salmon"))))
- '(font-lock-function-name-face ((t (:foreground "turquoise" :weight ultra-bold))))
- '(font-lock-keyword-face ((t (:foreground "light slate blue" :weight bold))))
- '(font-lock-string-face ((t (:background "#121212" :foreground "LightGoldenrod1" :slant italic :width ultra-condensed :family "Victor Mono"))))
- '(font-lock-variable-name-face ((t (:foreground "green yellow"))))
- '(fringe ((t (:inherit default :foreground "#4b474c"))))
- '(helm-buffer-not-saved ((t (:foreground "color-118"))))
- '(helm-buffer-saved-out ((t (:background "black" :foreground "color-118"))))
- '(hl-line ((t (:background "#333333"))))
- '(italic ((t (:slant italic :family "Victor Mono"))))
- '(line-number ((t (:inherit default :background "#0a0a0a" :foreground "#333333" :strike-through nil :underline nil :slant normal :weight bold :height 0.8))))
- '(line-number-current-line ((t (:inherit default :background "aquamarine" :foreground "medium slate blue" :strike-through nil :underline nil :slant normal :weight bold :height 0.8))))
- '(markdown-header-face ((t (:inherit bold :foreground "green yellow" :height 1.1))))
- '(minibuffer-prompt ((t (:background "#161616" :foreground "LightGoldenrod1" :inverse-video nil))))
- '(mode-line ((t (:background "medium slate blue" :foreground "pink" :box nil :height 1.0))))
- '(mode-line-inactive ((t (:background "#0a0a0a" :foreground "gray60" :inverse-video nil :box nil :height 1.0))))
- '(sml/col-number ((t (:inherit sml/global :height 1.0))))
- '(sml/filename ((t (:inherit sml/global :foreground "pink" :weight bold))))
- '(sml/git ((t (:foreground "goldenrod1"))))
- '(sml/global ((t (:foreground "DarkSlateGray4" :inverse-video nil))))
- '(sml/line-number ((t (:inherit sml/modes :weight extra-bold :height 0.8))))
- '(sml/prefix ((t (:inherit sml/global :foreground "#777777"))))
- '(sml/time ((t (:inherit nil :distant-foreground "black" :foreground "#999999" :weight extra-bold :height 0.9 :width ultra-condensed :family "Iosevka Fixed SS05"))))
- '(sml/vc ((t (:inherit sml/git :distant-foreground "#d4d4d4" :inverse-video nil :overline t :weight bold :height 1.0))))
- '(solaire-default-face ((t (:inherit default :background "#0a0a0a"))))
- '(telephone-line-accent-active ((t (:background "aquamarine" :foreground "medium slate blue" :weight bold :width ultra-condensed :family "Iosevka"))))
- '(telephone-line-accent-inactive ((t (:background "#0a0a0a" :foreground "#d4d4d4"))))
- '(vertical-border ((t nil)))
- '(web-mode-keyword-face ((t (:foreground "medium slate blue"))))
- '(web-mode-string-face ((t (:inherit font-lock-string-face :foreground "#FBE3BF")))))
