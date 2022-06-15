@@ -1,5 +1,6 @@
-;; * Today I Achieved: %^{What's there to crow about?} :tia:%^G
-;; :PROPERTIES:
-;; :END:
-;;
-;; %?
+* Today I Achieved: %^{What's there to crow about?} :tia:
+ :PROPERTIES:
+ :ID: ${id}
+ :END:
+
+%?

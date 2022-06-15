@@ -190,7 +190,7 @@ uaoe
         (org-roam-dailies-capture-templates
           '(("d" "default" entry "* %<%I:%M %p>: %?"
              :if-new (file+head "%<%Y_%m_%d>.org" "#+title: %<%Y-%m-%d>\n"))
-            ("t" "TIA" entry (file (concat user-emacs-directory "snippets/org/roam-tia-entry.org"))
+            ("t" "TIA" entry (file "~/Development/_Emacs/dotemacs/snippets/org/roam-entry-tia.org")
              :if-new (file+head "%<%Y_%m_%d>.org" "#+title: %<%Y-%m-%d>\n" )))))
 #+end_src
 
