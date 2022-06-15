@@ -11,6 +11,7 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    '(treemacs-all-the-icons smartparens treemacs-icons-dired treemacs treeview pretty-hydra hydra company olivetti imenu-list org-modern flymake-jshint typescript-mode org-roam edit-indirect flymake-php flymake-phpcs package-lint-flymake diff-hl git-gutter-fringe+ solaire-mode rainbow-delimiters telephone-line helm-mode-manager use-package sml-modeline smart-mode-line lua-mode golden-ratio doom-themes all-the-icons))
+ '(safe-local-variable-values '((org-insert-tilde-language . emacs-lisp)))
  '(sml/show-frame-identification t)
  '(treemacs-icons-dired-mode t nil (treemacs-icons-dired))
  '(warning-suppress-log-types
@@ -67,6 +68,9 @@
  '(sml/time ((t (:inherit nil :distant-foreground "black" :foreground "#999999" :weight extra-bold :height 0.9 :width ultra-condensed :family "Iosevka Fixed SS05"))))
  '(sml/vc ((t (:inherit sml/git :distant-foreground "#d4d4d4" :inverse-video nil :overline t :weight bold :height 1.0))))
  '(solaire-default-face ((t (:inherit default :background "#0a0a0a"))))
+ '(tab-bar ((t (:background "black" :foreground "LightGoldenrod1" :box nil))))
+ '(tab-bar-tab ((t (:background "#191919" :foreground "hot pink" :box nil :slant italic :weight bold :family "Victor Mono"))))
+ '(tab-bar-tab-inactive ((t (:box nil :foreground "#AEAFAD" :background "black" :inherit tab-line-tab))))
  '(telephone-line-accent-active ((t (:background "aquamarine" :foreground "medium slate blue" :weight bold :width ultra-condensed :family "Iosevka"))))
  '(telephone-line-accent-inactive ((t (:background "#0a0a0a" :foreground "#d4d4d4"))))
  '(vertical-border ((t (:background "#121212" :foreground "medium slate blue"))))
