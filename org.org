@@ -20,126 +20,138 @@
 uaoe
 
 #+begin_src emacs-lisp
-  ;; SECTION :: Org Mode
-  ;; Troubleshootin': C-u M-x org-reload, if 'wrong number of arguments'
-  ;; :: Enable org fancy bullets
-  ;;(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-
-  (global-org-modern-mode 1)
-  (setq org-modern-todo-faces
-        (quote (("DO" :background "green"
-                 :foreground "black")
-                ("WAIT" :background "yellow"
-                 :foreground "black"))))
-
-  ;; :: Make org mode work with files ending in .
-  (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-  (setq truncate-lines nil)
-  ;; :: Set hook on task completion: ask for note
-  ;;(setq org-log-done 'note)
-  ;; :: Set default todo file
-  (setq org-agenda-files (list "~/Windows/Notes/org/todo/default.org" "~/org/todo/misc.org"))
-  ;; :: Set Todo keywords
-  ;;(setq org-todo-keywords
-  ;;      '((sequence "TODO" "WAIT" "VERIFY" "|" "DONE" "DELEGATED")))
-  ;;(setq org-todo-keyword-faces
-  ;; '(("IN-PROGRESS" . "orange") ("WAIT" . "yellow") ("CANCELED" . "red") ("DO" . "green"))
-  ;; )
-
-  (setq
-   ;; Edit settings
-   org-auto-align-tags nil
-   org-tags-column 0
-   org-catch-invisible-edits 'show-and-error
-   org-special-ctrl-a/e t
-   org-insert-heading-respect-content t
-
-   ;; Org styling, hide markup etc.
-   org-hide-emphasis-markers t
-   org-pretty-entities t
-   org-ellipsis "…"
-
-   ;; Agenda styling
-   org-agenda-block-separator ?─
-   org-agenda-time-grid
-   '((daily today require-timed)
-     (800 1000 1200 1400 1600 1800 2000)
-     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
-   org-agenda-current-time-string
-   "⭠ now ─────────────────────────────────────────────────")
-
-  ;; Set timestamp on TODO create
-  ;;(setq org-treat-insert-todo-heading-as-state-change t)
-  (defun my/log-todo-creation-date (&rest ignore)
-    "Log TODO creation time in the property drawer under the key 'CREATED'."
-    (when (and (org-get-todo-state)
-               (not (org-entry-get nil "CREATED")))
-      (org-entry-put nil "CREATED" (format-time-string (cdr org-time-stamp-formats)))))
-  (advice-add 'org-insert-todo-heading :after #'my/log-todo-creation-date)
-  (advice-add 'org-insert-todo-heading-respect-content :after #'my/log-todo-creation-date)
-  (advice-add 'org-insert-todo-subheading :after #'my/log-todo-creation-date)
-  (add-hook 'org-after-todo-state-change-hook #'my/log-todo-creation-date)
-  ;; Setup agenda command to show completed tasks
-  ;; https://emacs.stackexchange.com/questions/52994/org-mode-agenda-show-list-of-tasks-done-in-the-past-and-not-those-clocked
-  (setq org-agenda-custom-commands
-        '(("W" "Weekly review with archives"
-           agenda ""
-           ((org-agenda-start-day "-6d")
-            (org-agenda-span 14)
-            (org-agenda-start-on-weekday 1)
-            (org-agenda-archives-mode t)
-            (org-agenda-start-with-log-mode t)
-            (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp "^\\*\\* DONE "))))
-          ("R" "Weekly review"
-           agenda ""
-           ((org-agenda-start-day "-6d")
-            (org-agenda-span 14)
-            (org-agenda-start-on-weekday 1)
-            (org-agenda-start-with-log-mode '(closed))
-            (org-agenda-archives-mode t)
-            (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp "^\\*\\* DONE "))))
-          ("n" "Agenda and all TODOs"
-           agenda ""
-           ((alltodo "")))
-          ))
-  ;; :: Set fancy todo states
-  ;;(setq org-todo-keywords '((sequence "☛ TODO(t)" "|" "<img draggable="false" role="img" class="emoji" alt="✔" src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/svg/2714.svg"> DONE(d)")
-  ;;(sequence "⚑ WAITING(w)" "|")
-  ;;(sequence "|" "✘ CANCELED(c)")))
-  ;; :: Set Color coding for @ contexts
-  ;; https://stackoverflow.com/questions/40876294/color-tags-based-on-regex-emacs-org-mode/40918994#40918994
-  ;; :: Set agenda key bindings
-
-  ;; :: ORG ROAM
-  ;;(setq org-roam-directory (file-truename "~/Dropbox/org"))
-
-  ;; (use-package org-roam
-  ;;   :custom
-  ;;   (org-roam-directory "~/Dropbox/org/")
-  ;;   
-  ;;   (org-roam-capture-templates
-  ;;    '(("d" "default" plain
-  ;;       #'org-roam-capture--get-point "%?"
-  ;;       :target (file+head "pages/${slug}.org"
-  ;;                          "#+title: ${title}\n")
-  ;;       :unnarrowed t))))
-  ;; (org-roam-setup)
-
-  ;; ==================================
-  ;; Org-roam mode!
-
-  (defun roygbyte/org-roam-tia--entry ()
-    (prog1 (concat "* Today I Achieved: %? \n"
-                   ":PROPERTIES:\n"
-                   ;; Add file tags
-                   ":END:\n")))
-
-  ;; (concat ":ID: " (org-id-new) "\n")
-
-  ;; So the issue with my template is that the template string passed to the ... template (?) needs to be a file
+      ;; SECTION :: Org Mode
+      ;; Troubleshootin': C-u M-x org-reload, if 'wrong number of arguments'
+      ;; :: Enable org fancy bullets
+      ;;(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
 
-  ;;(setq org-roam-dailies-directory "journals/")
+  ;; (use-package company-org-roam
+  ;;   :ensure t
+  ;;   ;; You may want to pin in case the version from stable.melpa.org is not working
+  ;;   ; :pin melpa
+  ;;   :config
+  ;;   (push 'company-org-roam company-backends))
+
+      (global-org-modern-mode 1)
+      ;; (setq org-modern-todo-faces
+      ;;       (quote (("DO" :background "green"
+      ;;                :foreground "black")
+      ;;               ("WAIT" :background "yellow"
+      ;;                :foreground "black"))))
+
+      ;; :: Make org mode work with files ending in .
+      (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+      (setq truncate-lines nil)
+      ;; :: Set hook on task completion: ask for note
+      ;;(setq org-log-done 'note)
+      ;; :: Set default todo file
+      (setq org-agenda-files (list "~/Windows/Notes/org/todo/default.org" "~/org/todo/misc.org"))
+      ;; :: Set Todo keywords
+      ;;(setq org-todo-keywords
+      ;;      '((sequence "TODO" "WAIT" "VERIFY" "|" "DONE" "DELEGATED")))
+      ;;(setq org-todo-keyword-faces
+      ;; '(("IN-PROGRESS" . "orange") ("WAIT" . "yellow") ("CANCELED" . "red") ("DO" . "green"))
+      ;; )
+
+    (setq org-roam-node-display-template
+          (concat "${title:*} "
+                  (propertize "${tags:10}" 'face 'org-modern-tag)))
+
+      (setq
+       ;; Edit settings
+       org-auto-align-tags nil
+       org-tags-column 0
+       org-catch-invisible-edits 'show-and-error
+       org-special-ctrl-a/e t
+       org-insert-heading-respect-content t
+
+       ;; Org styling, hide markup etc.
+       org-hide-emphasis-markers t
+       org-pretty-entities t
+       org-ellipsis "…"
+
+       ;; Agenda styling
+       org-agenda-block-separator ?─
+       org-agenda-time-grid
+       '((daily today require-timed)
+         (800 1000 1200 1400 1600 1800 2000)
+         " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+       org-agenda-current-time-string
+       "⭠ now ─────────────────────────────────────────────────")
+
+      ;; Set timestamp on TODO create
+      ;;(setq org-treat-insert-todo-heading-as-state-change t)
+      (defun my/log-todo-creation-date (&rest ignore)
+        "Log TODO creation time in the property drawer under the key 'CREATED'."
+        (when (and (org-get-todo-state)
+                   (not (org-entry-get nil "CREATED")))
+          (org-entry-put nil "CREATED" (format-time-string (cdr org-time-stamp-formats)))))
+      (advice-add 'org-insert-todo-heading :after #'my/log-todo-creation-date)
+      (advice-add 'org-insert-todo-heading-respect-content :after #'my/log-todo-creation-date)
+      (advice-add 'org-insert-todo-subheading :after #'my/log-todo-creation-date)
+      (add-hook 'org-after-todo-state-change-hook #'my/log-todo-creation-date)
+      ;; Setup agenda command to show completed tasks
+      ;; https://emacs.stackexchange.com/questions/52994/org-mode-agenda-show-list-of-tasks-done-in-the-past-and-not-those-clocked
+      (setq org-agenda-custom-commands
+            '(("W" "Weekly review with archives"
+               agenda ""
+               ((org-agenda-start-day "-6d")
+                (org-agenda-span 14)
+                (org-agenda-start-on-weekday 1)
+                (org-agenda-archives-mode t)
+                (org-agenda-start-with-log-mode t)
+                (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp "^\\*\\* DONE "))))
+              ("R" "Weekly review"
+               agenda ""
+               ((org-agenda-start-day "-6d")
+                (org-agenda-span 14)
+                (org-agenda-start-on-weekday 1)
+                (org-agenda-start-with-log-mode '(closed))
+                (org-agenda-archives-mode t)
+                (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp "^\\*\\* DONE "))))
+              ("n" "Agenda and all TODOs"
+               agenda ""
+               ((alltodo "")))
+              ))
+      ;; :: Set fancy todo states
+      ;;(setq org-todo-keywords '((sequence "☛ TODO(t)" "|" "<img draggable="false" role="img" class="emoji" alt="✔" src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/svg/2714.svg"> DONE(d)")
+      ;;(sequence "⚑ WAITING(w)" "|")
+      ;;(sequence "|" "✘ CANCELED(c)")))
+      ;; :: Set Color coding for @ contexts
+      ;; https://stackoverflow.com/questions/40876294/color-tags-based-on-regex-emacs-org-mode/40918994#40918994
+      ;; :: Set agenda key bindings
+
+      ;; :: ORG ROAM
+      ;;(setq org-roam-directory (file-truename "~/Dropbox/org"))
+
+      ;; (use-package org-roam
+      ;;   :custom
+      ;;   (org-roam-directory "~/Dropbox/org/")
+      ;;
+      ;;   (org-roam-capture-templates
+      ;;    '(("d" "default" plain
+      ;;       #'org-roam-capture--get-point "%?"
+      ;;       :target (file+head "pages/${slug}.org"
+      ;;                          "#+title: ${title}\n")
+      ;;       :unnarrowed t))))
+      ;; (org-roam-setup)
+
+      ;; ==================================
+      ;; Org-roam mode!
+
+      (defun roygbyte/org-roam-tia--entry ()
+        (prog1 (concat "* Today I Achieved: %? \n"
+                       ":PROPERTIES:\n"
+                       ;; Add file tags
+                       ":END:\n")))
+
+      ;; (concat ":ID: " (org-id-new) "\n")
+
+      ;; So the issue with my template is that the template string passed to the ... template (?) needs to be a file
+
+
+      ;;(setq org-roam-dailies-directory "journals/")
 
 #+end_src
 
@@ -150,8 +162,8 @@ uaoe
 
 
 #+begin_src emacs-lisp
-  (use-package org-roam 
-        :ensure t 
+  (use-package org-roam
+        :ensure t
         :custom
         (org-roam-directory "~/Dropbox/org")
         (org-roam-dailies-directory "journals/")
@@ -159,10 +171,10 @@ uaoe
         (org-roam-complete-everywhere t)
         (org-roam-node-display-template ;; Rollback org-roam find behavior to show tags
               (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-        :init 
+        :init
         (setq org-roam-v2-ack t)
         (org-roam-db-autosync-mode t))
-#+end_src  
+#+end_src
 
 *** Capture templates
 
@@ -172,7 +184,15 @@ uaoe
     (org-roam-capture-templates
           '(
             ("d" "default" plain "%?"
-             :target (file+head "pages/${slug}.org" ;; add .gpg for encryption!
+             :target (file+head "pages/${slug}.org"
+                                "#+title: ${title}\n")
+             :unnarrowed t)
+            ("r" "rambling" plain "%?"
+             :target (file+head "pages/${slug}.org"
+                                "#+title: ${title} :rambling:\n")
+             :unnarrowed t)
+            ("a" "random thought" entry "* %?"
+             :target (file+head "pages/random_thoughts.org"
                                 "#+title: ${title}\n")
              :unnarrowed t)
             ("e" "encrypted" plain "%?"
@@ -182,6 +202,8 @@ uaoe
   ;;  (org-roam-setup)
 #+end_src
 
+Add a template for "random thoughts".
+
 *** Dailies capture templates
 
 #+begin_src emacs-lisp
@@ -190,7 +212,7 @@ uaoe
         (org-roam-dailies-capture-templates
           '(("d" "default" entry "* %<%I:%M %p>: %?"
              :if-new (file+head "%<%Y_%m_%d>.org" "#+title: %<%Y-%m-%d>\n"))
-            ("t" "TIA" entry (file "~/Development/_Emacs/dotemacs/snippets/org/roam-entry-tia.org")
+            ("t" "TIA" entry (file "/home/scarlett/Development/_Emacs/dotemacs/snippets/org/roam-entry-tia.org")
              :if-new (file+head "%<%Y_%m_%d>.org" "#+title: %<%Y-%m-%d>\n" )))))
 #+end_src
 
