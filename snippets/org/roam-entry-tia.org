@@ -1,6 +1,6 @@
 * Today I Achieved: %^{What's there to crow about?} :tia:
  :PROPERTIES:
- :ID: ${id}
+ :ID: %(org-id-new)
  :END:
-
+ 
 %?
