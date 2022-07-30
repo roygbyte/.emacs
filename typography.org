@@ -1,0 +1,21 @@
+# -*- org-insert-tilde-language: emacs-lisp; -*-
+
+#+begin_src emacs-lisp
+  (set-face-attribute 'default nil
+                      :family "Iosevka Fixed"
+                      :height 110)
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package ligature
+    :load-path "/home/scarlett/Development/_Emacs/dotemacs/lisp/"
+    :config
+    ;; Enable all Iosevka ligatures in programming modes
+    (ligature-set-ligatures 'prog-mode '("<---" "<--"  "<<-" "<-" "->" "-->" "--->" "<->" "<-->" "<--->" "<---->" "<!--"
+                                         "<==" "<===" "<=" "=>" "=>>" "==>" "===>" ">=" "<=>" "<==>" "<===>" "<====>" "<!---"
+                                         "<~~" "<~" "~>" "~~>" "::" ":::" "==" "!=" "===" "!=="
+                                         ":=" ":-" ":+" "<*" "<*>" "*>" "<|" "<|>" "|>" "+:" "-:" "=:" "<******>" "++" "+++"))
+    ;; Enables ligature checks globally in all buffers. You can also do it
+    ;; per mode with `ligature-mode'.
+    (global-ligature-mode t))
+#+end_src

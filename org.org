@@ -11,20 +11,19 @@
 #+end_src
 
 
-* Configuration
+* Org modern
 
-#+begin_src emacs-lisp
+** Make the brackets for block quotes appear
 
-  ;; Made top and bottom brackets for src appear
-  ;; They are hidden in the first place b/c, at a certain size, Isoveka hides the text. They're too small!
-  
-      (define-fringe-bitmap 'org-modern--block-inner (make-vector 1 #x80) nil nil '(top t))
-    (define-fringe-bitmap 'org-modern--block-begin (vconcat (make-vector 10 0) [#xFF] (make-vector 117 #x80)) nil nil 'top)
-    (define-fringe-bitmap 'org-modern--block-end (vconcat (make-vector 117 #x80) [#xFF] (make-vector 10 0)) nil nil 'bottom)
+At some font sizes, the brackets disappear. This breaks my heart, because they are so pleasant to see!
 
+#+begin_src emacs-lisp  
+  (define-fringe-bitmap 'org-modern--block-inner (make-vector 1 #x80) nil nil '(top t))
+  (define-fringe-bitmap 'org-modern--block-begin (vconcat (make-vector 10 0) [#xFF] (make-vector 117 #x80)) nil nil 'top)
+  (define-fringe-bitmap 'org-modern--block-end (vconcat (make-vector 117 #x80) [#xFF] (make-vector 10 0)) nil nil 'bottom)
 #+end_src
 
-uaoe
+* Unsorted 
 
 #+begin_src emacs-lisp
     ;; SECTION :: Org Mode
@@ -162,8 +161,8 @@ uaoe
 
 
 #+begin_src emacs-lisp
-  (use-package org-roam 
-        :ensure t 
+  (use-package org-roam
+        :ensure t
         :custom
         (org-roam-directory "~/Dropbox/org")
         (org-roam-dailies-directory "journals/")
@@ -171,10 +170,10 @@ uaoe
         (org-roam-complete-everywhere t)
         (org-roam-node-display-template ;; Rollback org-roam find behavior to show tags
               (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-        :init 
+        :init
         (setq org-roam-v2-ack t)
         (org-roam-db-autosync-mode t))
-#+end_src  
+#+end_src
 
 *** Capture templates
 
@@ -184,7 +183,15 @@ uaoe
     (org-roam-capture-templates
           '(
             ("d" "default" plain "%?"
-             :target (file+head "pages/${slug}.org" ;; add .gpg for encryption!
+             :target (file+head "pages/${slug}.org"
+                                "#+title: ${title}\n")
+             :unnarrowed t)
+            ("r" "rambling" plain "%?"
+             :target (file+head "pages/${slug}.org"
+                                "#+title: ${title} :rambling:\n")
+             :unnarrowed t)
+            ("a" "random thought" entry "* %?"
+             :target (file+head "pages/random_thoughts.org"
                                 "#+title: ${title}\n")
              :unnarrowed t)
             ("e" "encrypted" plain "%?"
@@ -194,6 +201,8 @@ uaoe
   ;;  (org-roam-setup)
 #+end_src
 
+Add a template for "random thoughts".
+
 *** Dailies capture templates
 
 #+begin_src emacs-lisp
@@ -201,8 +210,8 @@ uaoe
     :custom
         (org-roam-dailies-capture-templates
           '(("d" "default" entry "* %<%I:%M %p>: %?"
-             :if-new (file+head "%<%Y_%m_%d>.org" "#+title: %<%Y-%m-%d>\n"))
-            ("t" "TIA" entry (file "~/Development/_Emacs/emacs/snippets/org/roam-entry-tia.org")
+             :if-new (file+head "%<%Y_%m_%d>.org" "#+title: %<%Y-%m-%d>\n"))e
+            ("t" "TIA" entry (file ((concat user-emacs-directory "/snippets/org/roam-entry-tia.org" )))
              :if-new (file+head "%<%Y_%m_%d>.org" "#+title: %<%Y-%m-%d>\n" )))))
 #+end_src
 

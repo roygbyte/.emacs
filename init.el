@@ -1,6 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (setq user-emacs-directory "/home/scarlett/Development/_Emacs/dotemacs/")
+(setq custom-theme-directory user-emacs-directory)
 (setq custom-file (expand-file-name ".emacs" user-emacs-directory))
 
 ;; (setq custom-file (concat user-emacs-directory "custom.el"))

@@ -1,0 +1,47 @@
+#+begin_src emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.html\\.twig\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+  (setq display-fill-column-indicator-character ".")
+  (setq fci-dash-pattern 0.25)
+  (setq fci-rule-use-dashes t)
+  (defun my-web-mode-hook ()
+    "Hooks for Web mode."
+    ;;  (setq web-mode-markup-indent-offset 2)
+    ;;  (setq web-mode-code-indent-offset 2)
+    ;;  (setq web-mode-css-indent-offset 2)
+    ;;  (setq web-mode-comment-style 2)
+    (display-fill-column-indicator-mode)
+    (flymake-php-load)
+    )
+  (add-hook 'web-mode-hook #'my-web-mode-hook)
+  ;;(add-hook 'php-mode-hook #'flymake-php-load)
+  (setq web-mode-engines-alist
+        '(("php"    . "\\.phtml\\'")
+          ("blade"  . "\\.blade\\."))
+        )
+  ;; Remove tab stops
+  (setq-default indent-tabs-mode nil)
+  ;; Highlight current column
+  (setq web-mode-enable-current-column-highlight t)
+  ;; Snippets
+  (setq web-mode-extra-snippets
+        '(("erb" . (("toto" . "<% toto | %>\n\n<% end %>")))
+          ("php" . (("bif" . "@if (|) \n@else\n @endif")
+                    ("!" . "{!! $| !!}")
+                    ("bforeach" . "@foreach ($|) \n\n @endforeach")
+                    ("div" . "<div class=\"|\">\n</div>")
+                    ("uselog" . "use Illuminate\\Support\\Facades\\Log;")
+                    ("publicfunction" . "/**\n*\n*\n*/\npublic function |()\n{\n}\n")
+                    ("debug" . "<?php error_log(__LINE__); ?>")))
+          ))
+#+end_src

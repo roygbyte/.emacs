@@ -1,15 +1,44 @@
 # -*- org-insert-tilde-language: emacs-lisp; -*-
 
-* Tab bar mode
+* Remove big divider between windows
 
 #+begin_src emacs-lisp
-  (add-to-list 'tab-bar-format 'tab-bar-format-align-right t)
-  (add-to-list 'tab-bar-format 'tab-bar-format-global t)
-  (display-time-mode)
+  (window-divider-mode -1)
+#+end_src
+
+* Tab bar mode, and adjustments
+
+** Enabled tab bar
+
+#+begin_src emacs-lisp
   (tab-bar-mode 1)
 #+end_src
 
-* Cursor
+** Remove the load average stat
+
+#+begin_src emacs-lisp
+  (setq display-time-default-load-average nil)
+#+end_src
+
+** Make the clock fit on one line
+
+How much time have I spent trying to get the time to display properly in my =tab bar=? Too much time. The fix below comes by corteousy of [[https://emacs.stackexchange.com/questions/72087/how-to-move-the-time-and-date-displayed-in-the-tab-bar-a-couple-of-character-to][Emperor Udan]]'s question on StackOverflow. It subtracts a few pixels (=- right, hpos 3)= to make room for the time.
+
+#+begin_src emacs-lisp
+  (eval-after-load "tab-bar"
+    (defun tab-bar-format-align-right ()
+      "Align the rest of tab bar items to the right."
+      (let* ((rest (cdr (memq 'tab-bar-format-align-right tab-bar-format)))
+             (rest (tab-bar-format-list rest))
+             (rest (mapconcat (lambda (item) (nth 2 item)) rest ""))
+             (hpos (length rest))
+             (str (propertize " " 'display `(space :align-to (- right, hpos 3)))))
+        `((align-right menu-item ,str ignore)))))
+#+end_src
+
+* Make the cursor blinky
+
+For my own amusement, I like to have the cursor blink through a list of colours. 
 
 #+begin_src emacs-lisp
   (defvar blink-cursor-colors (list  "#92c48f" "#6785c5" "#be369c" "#d9ca65")
@@ -27,4 +56,4 @@
       )
     (internal-show-cursor nil (not (internal-show-cursor-p)))
     )
-#+end_src
+    #+END_src

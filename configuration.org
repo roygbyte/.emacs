@@ -1,277 +1,434 @@
 # -*- org-insert-tilde-language: emacs-lisp; -*-
 
 #+begin_src emacs-lisp
-      (require 'package)
-      ;; :: Add Melpa, Elpa, and local package locations.
-      (add-to-list 'package-archives
-		   '("melpa" . "http://melpa.org/packages/") t)
-      ;;(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
-      ;; Local packages are located in a directory called "lisp" which is located in same directory as this file.
-      ;;(message (concat (expand-file-name (locate-dominating-file buffer-file-name ".emacs")) "lisp/"))
-      (add-to-list 'load-path "/home/scarlett/Development/_Emacs/emacs/lisp/")
-      ;;(add-to-list 'load-path "/home/scarlett/.emacs.d/lisp/")
-      ;; Require the local packages.
-      (require 'awesome-tray)
-      (require 'htmlize)
-      (require 'web-mode)
-      (require 'haskell-unicode-input-method)
-      (require 'package)
-      ;;(require 'org)
-      ;;(require 'ligature)
-      (require 'org-bullets)
-      (require 'frame-cmds)
-      (require 'buffer-move)
-      (require 'dired+)
-      (require 'smartparens-config)
-      (require 'all-the-icons)
-      (require 'org-modern)
-  (require 'beacon)
-  (require 'vulpea)
-      ;; :: Initialize packages.
-      (package-initialize)
-      (unless (package-installed-p 'use-package)
-	(package-refresh-contents)
-	(package-install 'use-package))
-      ;; ========================================
-      ;; SECTION ::
-      ;; :: Setup autosave directory
-      (setq backup-directory-alist
-	    `(("." . ,(concat user-emacs-directory "backups"))))
+        ;;      _       _
+        ;;     | |     | |
+        ;;   __| | ___ | |_    ___ _ __ ___   __ _  ___ ___
+        ;;  / _` |/ _ \| __|  / _ \ '_ ` _ \ / _` |/ __/ __|
+        ;; | (_| | (_) | |_  |  __/ | | | | | (_| | (__\__ \
+        ;;  \__,_|\___/ \__|  \___|_| |_| |_|\__,_|\___|___/
+        ;;
+        ;;
+        ;;
+        ;; ========================================
+        ;; SECTION :: Setup Packages!
+        (require 'package)
+        ;; :: Add Melpa, Elpa, and local package locations.
+        (add-to-list 'package-archives
+                     '("melpa" . "http://melpa.org/packages/") t)
+        ;;(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+        ;; Local packages are located in a directory called "lisp" which is located in same directory as this file.
+        ;;(message (concat (expand-file-name (locate-dominating-file buffer-file-name ".emacs")) "lisp/"))
+        (add-to-list 'load-path (concat user-emacs-directory "/lisp/"))
+        ;; Require the local packages.
+        (require 'awesome-tray)
+        (require 'htmlize)
+        (require 'web-mode)
+        (require 'haskell-unicode-input-method)
+        (require 'package)
+        ;;(require 'org)
+        ;;(require 'ligature)
+        (require 'org-bullets)
+        (require 'frame-cmds)
+        (require 'buffer-move)
+        (require 'dired+)
+        (require 'smartparens-config)
+        (require 'all-the-icons)
+        (require 'org-modern)
+        ;; :: Initialize packages.
+        (package-initialize)
+        (unless (package-installed-p 'use-package)
+          (package-refresh-contents)
+          (package-install 'use-package))
+    ;; =============================3===========
+        ;; SECTION ::
+        ;; :: Setup autosave directory
+        (setq backup-directory-alist
+              `(("." . ,(concat user-emacs-directory "backups"))))
 
-      (setq ring-bell-function 'ignore)
+    (setq ring-bell-function 'ignore)
 
-    (require 'epa-file)
-  (epa-file-enable)
+    ;; ========================================
+        ;; SECTION :: Appearance
+        ;; --------------------------------------
+        ;; SUB SECTION :: Theme
+        ;; :: My tweaks are based on the DOOM-1337 theme, which I quite like by itself.
+        ;; :: I decided to personalize it a little bit... and those customizations
+        ;; :: are added at the end of this file.
+        (load-theme 'babycat t)
+        ;; :: Use Iosevka as the default font. Victor Mono is also used (for comments), but that's
+        ;; :: configured in `customize-face`.
+        (set-face-attribute 'default nil
+                            :family "Iosevka Fixed"
+                            :height 110)
 
-       ;;; Stefan Monnier <foo at acm.org>. It is the opposite of fill-paragraph    
-      (defun unfill-paragraph (&optional region)
-	"Takes a multi-line paragraph and makes it into a single line of text."
-	(interactive (progn (barf-if-buffer-read-only) '(t)))
-	(let ((fill-column (point-max))
-	      ;; This would override `fill-column' if it's an integer.
-	      (emacs-lisp-docstring-fill-column t))
-	  (fill-paragraph nil region)))
-
-      ;; Handy key definition
-      (define-key global-map "\M-Q" 'unfill-paragraph)
-
-      (load-theme 'doom-1337 t)
-
-      (solaire-global-mode 1)
-
-      ;; SUB SECTION :: Miscellaneous tweaks
-      ;; :: Disable splash screen
-      (setq inhibit-splash-screen t)
-      ;; :: Hide the menubar, scrollbar, toolbar, and modeline
-      (toggle-frame-fullscreen)
-      (menu-bar-mode -1)
-      (scroll-bar-mode -1)
-      (tool-bar-mode -1)
-      ;; :: Get rid of the scroll bar
-      (setq vertical-scroll-bar nil)
-      ;; :: Show the fringe on the side of the frame
-      (setq-default left-margin-width nil right-margin-width nil)
-      (set-window-buffer nil (current-buffer))
-      (setq fringes-outside-margins t)
-      (window-divider-mode)
-
-      (fringe-mode 1)
-      (set-fringe-style '(24 . 12))
-      ;;(set-face-attribute 'fringe nil :background nil)
-      ;; :: Show Git differences in the fringe
-      (global-diff-hl-mode 1)
-      (diff-hl-margin-mode)
-      (diff-hl-flydiff-mode)
-      ;; :: Highlight the active parentheses
-      (show-paren-mode 1)
-      ;; :: Show line numbbers
-      ;; (when (version<= "26.0.50" emacs-version )
-      ;;   (global-display-line-numbers-mode)))
-      ;;:: Highlight current line
-      (global-hl-line-mode 1)
-      (set-face-attribute 'hl-line nil
-			  :background "#333333")
-      ;; :: Remove the time display
-      ;;(display-time-mode -1)
-      ;; :: Enable transient mark mode
-      (transient-mark-mode 1)
-      ;; :: Enable icons in dired mode
-      ;;(add-hook 'dired-mode-hook #'all-the-icons-dired-mode)
-      ;; :: Enable telephone-line-mode, which makes the mode bar fancy.
-      (setq telephone-line-lhs
-	    '((evil   . (telephone-line-evil-tag-segment))
-	      (accent . (telephone-line-vc-segment
-			 telephone-line-erc-modified-channels-segment
-			 telephone-line-process-segment))
-	      (nil    . (telephone-line-minor-mode-segment
-			 telephone-line-buffer-segment))))
-      (setq telephone-line-rhs
-	    '((nil    . (telephone-line-misc-info-segment))
-	      (accent . (telephone-line-major-mode-segment))
-	      (evil   . (telephone-line-airline-position-segment))))
-      (telephone-line-mode 1)
-      ;; :: Make delimiters raindow colors
-      (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
-      (rainbow-delimiters-mode 1)
-
-    ;; :: Add ligatures
+        (solaire-global-mode 1)
 
 
-      ;;(setq split-height-threshold nil)
-      ;;(setq split-width-threshold 80)
-      ;; =======================================
-      ;; SECTION :: Elisp mode
+        ;; Tab bar ? What is this
+        (add-to-list 'tab-bar-format 'tab-bar-format-align-right t)
+        (add-to-list 'tab-bar-format 'tab-bar-format-global t)
+        (display-time-mode)
+        ;;(add-to-list 'tab-bar-format 'display-time-mode t)
+        (tab-bar-mode 1)
+        ;; --------------------------------------
+        ;; SUB SECTION :: Awesome Tray Mode
+        ;; :: Enable Awesome tray mode, which is used to move the time display
+        ;; :: to the mini-buffer.
+        ;; (awesome-tray-mode 1)
+        ;; ;; :: This is my preferred way to see the date
+        ;; (defun awesome-tray-module-date-info()
+        ;;   (format-time-string "%a, %b %-d %H:%M"))
+        ;; ;; :: Override awesome-tray's other modules--just display time.
+        ;; (setq awesome-tray-active-modules
+        ;;       '("date"))
+        ;; --------------------------------------
+        ;; SUB SECTION :: Miscellaneous tweaks
+    (add-hook 'before-save-hook 'whitespace-cleanup)
+        ;; :: Disable splash screen
+        (setq inhibit-splash-screen t)
+        ;; :: Hide the menubar, scrollbar, toolbar, and modeline
+        (toggle-frame-fullscreen)
+        (menu-bar-mode -1)
+        (scroll-bar-mode -1)
+        (tool-bar-mode -1)
+        ;; :: Get rid of the scroll bar
+        (setq vertical-scroll-bar nil)
+        ;; :: Show the fringe on the side of the frame
+        (setq-default left-margin-width nil right-margin-width nil)
+        (set-window-buffer nil (current-buffer))
+        (setq fringes-outside-margins t)
+        (window-divider-mode)
 
-      ;; (add-hook 'emacs-lisp-mode-hook (lambda ()
-      ;;                                   (smartparens-mode)
-      ;;                                   (smartparens-strict-mode t)
-      ;;                                   )
-
-      ;; =======================================
-      ;; SECTION :: Helm Mode
-      (helm-mode 1)
-      (setq-default helm-M-x-fuzzy-match t)
-      (global-set-key "\M-x" 'helm-M-x)
-      (global-set-key "\C-c\C-m" 'helm-M-x)
-      (global-set-key "\C-x\C-f" 'helm-find-files) ;; replace emacs default finder
-      (global-set-key (kbd "C-x b") 'helm-buffers-list)
-      ;; Might want to play around with these functions later
-      ;; (define-key evil-ex-map "b " 'helm-mini)
-      ;; (define-key evil-ex-map "e" 'helm-find-files)
-      ;; (require 'helm-projectile)
-      ;; (define-key evil-ex-map "g" 'helm-projectile-grep)
-      ;; (define-key evil-ex-map "f" 'helm-projectile-find-file)
-      ;; =======================================
-      ;; SECTION :: Magit Mode
-      (remove-hook 'server-switch-hook 'magit-commit-diff)
-      (setq magit-refresh-status-buffer nil)
-      ;; ========================================
-      ;; SECTION :: Python Mode
-      (defun my-restart-python-console ()
-	"Restart python console before evaluate buffer or region to avoid various uncanny conflicts, like not reloding modules even when they are changed"
-	(setq python-shell-completion-native-enable -1)
-	(interactive)
-	(if (get-buffer "*Python*")
-	    (let ((kill-buffer-query-functions nil)) (kill-buffer "*Python*")))
-	(run-python)
-	(python-shell-send-buffer))
-      ;; ========================================
-      ;; SECTION :: Desktop Mode
-      (desktop-save-mode 1)
-      (setq desktop-path '("~/.emacs.d/" "~" "."))
-      ;; =========================================
-
-
-      ;; SECTION :: Haskell Mode
-
-      ;; pretty symbols for haskell
-      ;;(load "~/.emacs.d/lisp/emacs-rc-pretty-lambda.el")
-
-      ;; :: Set Pretty Haskell Symbols
-      (add-hook 'haskell-mode-hook
-		(lambda () (set-input-method "haskell-unicode")))
-
-
-      ;; ==========================================
-      ;; SECTION :: Custom helper functions
-      ;; from numlocked on yCombinator
-      (defun arrayify (start end quote)
-	"Turn strings on newlines into a QUOTEd, comma-separated one-liner."
-	(interactive "r\nMQuote: ")
-	(let ((insertion
-	       (mapconcat
-		(lambda (x) (format "%s%s%s" quote x quote))
-		(split-string (buffer-substring start end)) ", ")))
-	  (delete-region start end)
-	  (insert insertion)))
-
-      ;; ==========================================
-      ;; SECTION :: Custom key bindings
-      ;; :: Setup hotkeys for moving to top/bottom of buffer.
-      (global-set-key (kbd "C-<") 'beginning-of-buffer)
-      (global-set-key (kbd "C->") 'end-of-buffer)
-      ;; :: Enable active buffer switch with arrow keys.
-      ;; (when (fboundp 'windmove-default-keybindings)
-      ;;   (windmove-default-keybindings))
-      ;; (windmove-default-keybindings)
-      (global-set-key (kbd "M-<up>") 'windmove-up)
-      (global-set-key (kbd "M-<down>") 'windmove-down)
-      (global-set-key (kbd "M-<left>") 'windmove-left)
-      (global-set-key (kbd "M-<right>") 'windmove-right)
-
-      ;; :: Setup hotkeys for windows scrolling other window.
-      ;;(define-key global-map [(meta up)] '(lambda() (interactive) (scroll-other-window -1)))
-      ;;(define-key global-map [(meta down)] '(lambda() (interactive) (scroll-other-window 1)))
-      ;; :: Enable handy keybind for new line.
-      (defun newline-without-break-of-line ()
-	(interactive)
-	(let ((oldpos (point)))
-	  (end-of-line)
-	  (newline-and-indent)))
-      (global-set-key (kbd "<M-RET>") 'newline-without-break-of-line)
-
-      ;; :: Setup hotkeys to start python console.
-      (global-set-key (kbd "C-c C-x C-c") 'my-restart-python-console)
-      ;; ==========================================
-      ;; SECTION :: The Wasteland
-      ;;            Functions not working, or experimental
-
-      ;; :: Dunno?? -*- mode: elisp -*-
-
-      ;; :: Ctl+Shift+Return new line
-      (global-set-key (kbd "<C-S-RET>") (lambda ()
-					  (interactive)
-					  (beginning-of-line)
-					  (newline-and-indent)
-					  (previous-line)))
+        (fringe-mode 1)
+        (set-fringe-style '(12 . 12))
+        (set-face-attribute 'fringe nil :background nil)
+        ;; :: Show Git differences in the fringe
+        (global-diff-hl-mode 1)
+        (diff-hl-margin-mode)
+        (diff-hl-flydiff-mode)
+        ;; :: Highlight the active parentheses
+        (show-paren-mode 1)
+        ;; :: Show line numbbers
+        ;;(when (version<= "26.0.50" emacs-version )
+        ;;  (global-display-line-numbers-mode))
+        ;; :: Highlight current line
+        (global-hl-line-mode 1)
+        ;; :: Remove the time display
+        ;;(display-time-mode -1)
+        ;; :: Enable transient mark mode
+        (transient-mark-mode 1)
+        ;; :: Enable icons in dired mode
+        ;;(add-hook 'dired-mode-hook #'all-the-icons-dired-mode)
+        ;; :: Enable telephone-line-mode, which makes the mode bar fancy.
+        ;; (setq telephone-line-lhs
+        ;;       '((evil   . (telephone-line-evil-tag-segment))
+        ;;         (accent . (telephone-line-vc-segment
+        ;;                    telephone-line-erc-modified-channels-segment
+        ;;                    telephone-line-process-segment))
+        ;;         (nil    . (telephone-line-minor-mode-segment
+        ;;                    telephone-line-buffer-segment))))
+        ;; (setq telephone-line-rhs
+        ;;       '((nil    . (telephone-line-misc-info-segment))
+        ;;         (accent . (telephone-line-major-mode-segment))
+        ;;         (evil   . (telephone-line-airline-position-segment))))
+        ;; (telephone-line-mode 1)
 
 
-      ;; (set-face-background 'vertical-border "#161616")
-      ;; (set-face-foreground 'vertical-border (face-background 'vertical-border))
+  (doom-modeline-mode t)
+  (setq doom-modeline-hud t)
+    (setq doom-modeline-vcs-max-length 500)
 
-      ;; (defun rag-set-face (frame)
-      ;;   "Configure faces on frame creation"
-      ;;   (select-frame frame)
-      ;;   (if (display-graphic)
-      ;;       (progn
-      ;;         (when (member "Iosevka" (font-family-list))
-      ;;           (progn
-      ;;             (set-frame-font "Iosevka" nil t))))))
-      ;; (add-hook 'after-make-frame-functions #'rag-set-face)
+        ;; :: Make delimiters raindow colors
+        (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+        (rainbow-delimiters-mode 1)
+        ;; :: Add ligatures
+        (use-package ligature
+          :load-path "/home/scarlett/Development/_Emacs/dotemacs/lisp/"
+          :config
+          ;; Enable all Iosevka ligatures in programming modes
+          (ligature-set-ligatures 'prog-mode '("<---" "<--"  "<<-" "<-" "->" "-->" "--->" "<->" "<-->" "<--->" "<---->" "<!--"
+                                               "<==" "<===" "<=" "=>" "=>>" "==>" "===>" ">=" "<=>" "<==>" "<===>" "<====>" "<!---"
+                                               "<~~" "<~" "~>" "~~>" "::" ":::" "==" "!=" "===" "!=="
+                                               ":=" ":-" ":+" "<*" "<*>" "*>" "<|" "<|>" "|>" "+:" "-:" "=:" "<******>" "++" "+++"))
+          ;; Enables ligature checks globally in all buffers. You can also do it
+          ;; per mode with `ligature-mode'.
+          (global-ligature-mode t))
+        ;;(setq split-height-threshold nil)
+        ;;(setq split-width-threshold 80)
+        ;; =======================================
+        ;; SECTION :: Elisp mode
 
-      ;;set frame font when running emacs normally
-      ;; (when (member "Iosevka" (font-family-list))
-      ;;   (progn
-      ;;     (set-frame-font "Iosevka" nil t)))
+        ;; (add-hook 'emacs-lisp-mode-hook (lambda ()
+        ;;                                   (smartparens-mode)
+        ;;                                   (smartparens-strict-mode t)
+        ;;                                   )
 
-      ;; hack for annoying mini buffer thing
-      ;; see: http://trey-jackson.blogspot.com/2010/04/emacs-tip-36-abort-minibuffer-when.html
-      (defun stop-using-minibuffer ()
-	"kill the minibuffer"
-	(when (and (>= (recursion-depth) 1) (active-minibuffer-window))
-	  (abort-recursive-edit)))
+        ;; =======================================
+        ;; SECTION :: Helm Mode
+        (helm-mode 1)
+        (setq-default helm-M-x-fuzzy-match t)
+        (global-set-key "\M-x" 'helm-M-x)
+        (global-set-key "\C-c\C-m" 'helm-M-x)
+        (global-set-key "\C-x\C-f" 'helm-find-files) ;; replace emacs default finder
+        (global-set-key (kbd "C-x b") 'helm-buffers-list)
+        ;; Might want to play around with these functions later
+        ;; (define-key evil-ex-map "b " 'helm-mini)
+        ;; (define-key evil-ex-map "e" 'helm-find-files)
+        ;; (require 'helm-projectile)
+        ;; (define-key evil-ex-map "g" 'helm-projectile-grep)
+        ;; (define-key evil-ex-map "f" 'helm-projectile-find-file)
+        ;; =======================================
+        ;; SECTION :: Magit Mode
+        (remove-hook 'server-switch-hook 'magit-commit-diff)
+        (setq magit-refresh-status-buffer nil)
+        ;; ========================================
+        ;; SECTION :: Python Mode
+        (defun my-restart-python-console ()
+          "Restart python console before evaluate buffer or region to avoid various uncanny conflicts, like not reloding modules even when they are changed"
+          (setq python-shell-completion-native-enable -1)
+          (interactive)
+          (if (get-buffer "*Python*")
+              (let ((kill-buffer-query-functions nil)) (kill-buffer "*Python*")))
+          (run-python)
+          (python-shell-send-buffer))
+        ;; ========================================
+        ;; SECTION :: Desktop Mode
+        (desktop-save-mode 1)
+        (setq desktop-path '("~/.emacs.d/" "~" "."))
+        ;; =========================================
 
-      (add-hook 'mouse-leave-buffer-hook 'stop-using-minibuffer)
+        ;; Add tags to the org roam find
+        ;; https://emacs.stackexchange.com/questions/70552/tag-column-for-filetag-in-org-roam-node-list-is-is-gone/70560#
 
-      ;; Insert new line below current line
-      ;; and move cursor to new line
-      ;; it will also indent newline
-      ;;(global-set-key (kbd "<C-return>") (lambda ()
-      ;;                 (interactive)
-      ;;               (end-of-line)
-      ;;             (newline-and-indent)))
+
+        ;; (defmacro go-roam-find-file-project-fn (project)
+        ;;   "Define a function to find an `org-roam' file within the given PROJECT."
+        ;;   (let* ((fn-name (intern (concat "go-roam-find-" (replace-regexp-in-string " +" "-" project))))
+        ;;          (docstring (concat "Find an `org-roam' file for: " project)))
+        ;;     `(defun ,fn-name (&optional completions filter-nf no-confirm)
+        ;;        ,docstring
+        ;;        (interactive)
+        ;;        (org-roam-find-file (concat ,project " ") completions filter-nf no-confirm))))
 
 
 
-      ;; Set indents to be 2 by default
-      ;;(setq-default indent-tabs-mode t)
-      ;;(setq-default tab-width 2)
-      ;;(setq indent-line-function 'insert-tab)
+        ;; (go-roam-find-file-project-fn "thel-sector")
+        ;; (go-roam-find-file-project-fn "ardu")
+        ;; (go-roam-find-file-project-fn "permanent bibliographies")
+        ;; (go-roam-find-file-project-fn "permanent cards")
+        ;; (go-roam-find-file-project-fn "hesburgh-libraries")
+        ;; (go-roam-find-file-project-fn "samvera")
 
-      ;; :: Enable EditorConfig Mode
-      ;;(editorconfig-mode 1)
+        ;; (defvar jnf-find-file-in-roam-project--title (with-octicon "book" "Find File in Roam Project" 1 -0.05))
+        ;; (pretty-hydra-define jnf-find-file-in-roam-project (:foreign-keys warn :title jnf-find-file-in-roam-project--title :quit-key "q")
+        ;;   (
+        ;;    "Permanent"
+        ;;    (("b" go-roam-find-permanent-bibliographies "Bibliography")
+        ;;     ("c" go-roam-find-permanent-cards "Card"))
+        ;;    "RPGs"
+        ;;    (("a" go-roam-find-ardu "Ardu, World of")
+        ;;     ("t" go-roam-find-thel-sector "Thel Sector"))
+        ;;    "Work"
+        ;;    (("h" go-roam-find-hesburgh-libraries "Hesburgh Libraries")
+        ;;     ("s" go-roam-find-samvera "Samvera"))
 
-      ;; https://www.emacswiki.org/emacs/DesktopMultipleSaveFiles
+        ;;    ))
+        ;; (global-set-key (kbd "M-1") 'jnf-find-file-in-roam-project/body)
+
+        ;; ==========================================
+        ;; SECITON :: Web Mode
+
+        ;; :: Set web mode hooks (PHP, HTML)
+        (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.html\\.twig\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+        (setq display-fill-column-indicator-character ".")
+        (setq fci-dash-pattern 0.25)
+        (setq fci-rule-use-dashes t)
+        (defun my-web-mode-hook ()
+          "Hooks for Web mode."
+          ;;  (setq web-mode-markup-indent-offset 2)
+          ;;  (setq web-mode-code-indent-offset 2)
+          ;;  (setq web-mode-css-indent-offset 2)
+          ;;  (setq web-mode-comment-style 2)
+          (display-fill-column-indicator-mode)
+          (flymake-php-load)
+          )
+        (add-hook 'web-mode-hook #'my-web-mode-hook)
+        ;;(add-hook 'php-mode-hook #'flymake-php-load)
+        (setq web-mode-engines-alist
+              '(("php"    . "\\.phtml\\'")
+                ("blade"  . "\\.blade\\."))
+              )
+        ;; Remove tab stops
+        (setq-default indent-tabs-mode nil)
+        ;; Highlight current column
+        (setq web-mode-enable-current-column-highlight t)
+        ;; Snippets
+        (setq web-mode-extra-snippets
+              '(("erb" . (("toto" . "<% toto | %>\n\n<% end %>")))
+                ("php" . (("bif" . "@if (|) \n@else\n @endif")
+                          ("!" . "{!! $| !!}")
+                          ("bforeach" . "@foreach ($|) \n\n @endforeach")
+                          ("div" . "<div class=\"|\">\n</div>")
+                          ("uselog" . "use Illuminate\\Support\\Facades\\Log;")
+                          ("publicfunction" . "/**\n*\n*\n*/\npublic function |()\n{\n}\n")
+                          ("debug" . "<?php error_log(__LINE__); ?>")))
+                ))
+        ;; =========================================
+        ;; SECTION :: Haskell Mode
+
+        ;; pretty symbols for haskell
+        ;;(load "~/.emacs.d/lisp/emacs-rc-pretty-lambda.el")
+
+        ;; :: Set Pretty Haskell Symbols
+        (add-hook 'haskell-mode-hook
+                  (lambda () (set-input-method "haskell-unicode")))
+        ;; =========================================
+        ;; SECTION :: Luamode Mode
+        (autoload 'lua-mode "lua-mode" "Lua editing mode." t)
+        (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
+        (add-to-list 'interpreter-mode-alist '("lua" . lua-mode))
+        (setq lua-indent-level 3)
+        (setq lua-electric-flag nil)
+        (setq lua-indent-nested-block-content-align nil)
+        (defun lua-abbrev-mode-off () (abbrev-mode 0))
+        (add-hook 'lua-mode-hook 'lua-abbrev-mode-off)
+        (setq save-abbrevs nil)   ;; is this still needed?
+        ;; ==========================================
+        ;; SECTION :: Custom helper functions
+        ;; from numlocked on yCombinator
+        (defun arrayify (start end quote)
+          "Turn strings on newlines into a QUOTEd, comma-separated one-liner."
+          (interactive "r\nMQuote: ")
+          (let ((insertion
+                 (mapconcat
+                  (lambda (x) (format "%s%s%s" quote x quote))
+                  (split-string (buffer-substring start end)) ", ")))
+            (delete-region start end)
+            (insert insertion)))
+
+        ;; ==========================================
+        ;; SECTION :: Party-zone
+        ;; :: Make the cursor blink through some colors.
+        (defvar blink-cursor-colors (list  "#92c48f" "#6785c5" "#be369c" "#d9ca65")
+          "On each blink the cursor will cycle to the next color in this list.")
+        (setq blink-cursor-count 0)
+        (defun blink-cursor-timer-function ()
+          "Zarza wrote this cyberpunk variant of timer `blink-cursor-timer'.
+        Warning: overwrites original version in `frame.el'.
+        This one changes the cursor color on each blink. Define colors in `blink-cursor-colors'."
+          (when (not (internal-show-cursor-p))
+            (when (>= blink-cursor-count (length blink-cursor-colors))
+              (setq blink-cursor-count 0))
+            (set-cursor-color (nth blink-cursor-count blink-cursor-colors))
+            (setq blink-cursor-count (+ 1 blink-cursor-count))
+            )
+          (internal-show-cursor nil (not (internal-show-cursor-p)))
+          )
+        ;; ==========================================
+        ;; SECTION :: Custom key bindings
+        ;; :: Setup hotkeys for moving to top/bottom of buffer.
+        (global-set-key (kbd "C-<") 'beginning-of-buffer)
+        (global-set-key (kbd "C->") 'end-of-buffer)
+        ;; :: Enable active buffer switch with arrow keys.
+        ;; (when (fboundp 'windmove-default-keybindings)
+        ;;   (windmove-default-keybindings))
+        ;; (windmove-default-keybindings)
+        (global-set-key (kbd "M-<up>") 'windmove-up)
+        (global-set-key (kbd "M-<down>") 'windmove-down)
+        (global-set-key (kbd "M-<left>") 'windmove-left)
+        (global-set-key (kbd "M-<right>") 'windmove-right)
+
+        ;; :: Setup hotkeys for windows scrolling other window.
+        ;;(define-key global-map [(meta up)] '(lambda() (interactive) (scroll-other-window -1)))
+        ;;(define-key global-map [(meta down)] '(lambda() (interactive) (scroll-other-window 1)))
+        ;; :: Enable handy keybind for new line.
+        (defun newline-without-break-of-line ()
+          (interactive)
+          (let ((oldpos (point)))
+            (end-of-line)
+            (newline-and-indent)))
+        (global-set-key (kbd "<M-RET>") 'newline-without-break-of-line)
+
+        ;; :: Setup hotkeys to start python console.
+        (global-set-key (kbd "C-c C-x C-c") 'my-restart-python-console)
+        ;; ==========================================
+        ;; SECTION :: The Wasteland
+        ;;            Functions not working, or experimental
+
+        ;; :: Dunno?? -*- mode: elisp -*-
+
+        ;; :: Ctl+Shift+Return new line
+        (global-set-key (kbd "<C-S-RET>") (lambda ()
+                                            (interactive)
+                                            (beginning-of-line)
+                                            (newline-and-indent)
+                                            (previous-line)))
+
+        ;; :: Show a clock
+        ;; (setq display-time-string-forms
+        ;;       '((propertize (concat day "/" dayname "/" monthname " - " 12-hours ":" minutes "" am-pm))))
+        ;; (display-time-mode -1)
+
+        ;; (global-visual-line-mode -1)
+
+        ;; (set-face-background 'vertical-border "#161616")
+        ;; (set-face-foreground 'vertical-border (face-background 'vertical-border))
+
+        ;; (defun rag-set-face (frame)
+        ;;   "Configure faces on frame creation"
+        ;;   (select-frame frame)
+        ;;   (if (display-graphic)
+        ;;       (progn
+        ;;         (when (member "Iosevka" (font-family-list))
+        ;;           (progn
+        ;;             (set-frame-font "Iosevka" nil t))))))
+        ;; (add-hook 'after-make-frame-functions #'rag-set-face)
+
+        ;;set frame font when running emacs normally
+        ;; (when (member "Iosevka" (font-family-list))
+        ;;   (progn
+        ;;     (set-frame-font "Iosevka" nil t)))
+
+        ;; hack for annoying mini buffer thing
+        ;; see: http://trey-jackson.blogspot.com/2010/04/emacs-tip-36-abort-minibuffer-when.html
+        (defun stop-using-minibuffer ()
+          "kill the minibuffer"
+          (when (and (>= (recursion-depth) 1) (active-minibuffer-window))
+            (abort-recursive-edit)))
+
+        (add-hook 'mouse-leave-buffer-hook 'stop-using-minibuffer)
+
+        ;; Insert new line below current line
+        ;; and move cursor to new line
+        ;; it will also indent newline
+        ;;(global-set-key (kbd "<C-return>") (lambda ()
+        ;;                 (interactive)
+        ;;               (end-of-line)
+        ;;             (newline-and-indent)))
+
+
+
+        ;; Set indents to be 2 by default
+        ;;(setq-default indent-tabs-mode t)
+        ;;(setq-default tab-width 2)
+        ;;(setq indent-line-function 'insert-tab)
+
+        ;; :: Enable EditorConfig Mode
+        ;;(editorconfig-mode 1)
+
+        ;; https://www.emacswiki.org/emacs/DesktopMultipleSaveFiles
 #+end_src
 
 #+RESULTS:
@@ -297,6 +454,7 @@
   (org-babel-load-file
    (concat user-emacs-directory "hydras.org"))
 #+end_src
+
 
 * Typograhpy
 
