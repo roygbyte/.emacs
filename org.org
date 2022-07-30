@@ -1,4 +1,4 @@
-# -*- org-insert-tilde-language: emacs-lisp; -*-
+ # -*- org-insert-tilde-language: emacs-lisp; -*-
 
 * Keybindings
 
@@ -15,133 +15,145 @@
 
 #+begin_src emacs-lisp
 
+  ;; Made top and bottom brackets for src appear
+  ;; They are hidden in the first place b/c, at a certain size, Isoveka hides the text. They're too small!
+  
+      (define-fringe-bitmap 'org-modern--block-inner (make-vector 1 #x80) nil nil '(top t))
+    (define-fringe-bitmap 'org-modern--block-begin (vconcat (make-vector 10 0) [#xFF] (make-vector 117 #x80)) nil nil 'top)
+    (define-fringe-bitmap 'org-modern--block-end (vconcat (make-vector 117 #x80) [#xFF] (make-vector 10 0)) nil nil 'bottom)
+
 #+end_src
 
 uaoe
 
 #+begin_src emacs-lisp
-  ;; SECTION :: Org Mode
-  ;; Troubleshootin': C-u M-x org-reload, if 'wrong number of arguments'
-  ;; :: Enable org fancy bullets
-  ;;(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+    ;; SECTION :: Org Mode
+    ;; Troubleshootin': C-u M-x org-reload, if 'wrong number of arguments'
+    ;; :: Enable org fancy bullets
+    ;;
 
-  (global-org-modern-mode 1)
-  (setq org-modern-todo-faces
-        (quote (("DO" :background "green"
-                 :foreground "black")
-                ("WAIT" :background "yellow"
-                 :foreground "black"))))
+  (add-hook 'org-mode-hook (lambda () (toggle-truncate-lines)))
 
-  ;; :: Make org mode work with files ending in .
-  (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-  (setq truncate-lines nil)
-  ;; :: Set hook on task completion: ask for note
-  ;;(setq org-log-done 'note)
-  ;; :: Set default todo file
-  (setq org-agenda-files (list "~/Windows/Notes/org/todo/default.org" "~/org/todo/misc.org"))
-  ;; :: Set Todo keywords
-  ;;(setq org-todo-keywords
-  ;;      '((sequence "TODO" "WAIT" "VERIFY" "|" "DONE" "DELEGATED")))
-  ;;(setq org-todo-keyword-faces
-  ;; '(("IN-PROGRESS" . "orange") ("WAIT" . "yellow") ("CANCELED" . "red") ("DO" . "green"))
-  ;; )
+    (global-org-modern-mode 1)
+    (setq org-modern-todo-faces
+	  (quote (("DO" :background "green"
+		   :foreground "black")
+		  ("WAIT" :background "yellow"
+		   :foreground "black"))))
 
-  (setq
-   ;; Edit settings
-   org-auto-align-tags nil
-   org-tags-column 0
-   org-catch-invisible-edits 'show-and-error
-   org-special-ctrl-a/e t
-   org-insert-heading-respect-content t
+    ;; :: Make org mode work with files ending in .
+    (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+    (setq truncate-lines nil)
+    ;; :: Set hook on task completion: ask for note
+    ;;(setq org-log-done 'note)
+    ;; :: Set default todo file
+    (setq org-agenda-files (list "~/Windows/Notes/org/todo/default.org" "~/org/todo/misc.org"))
+    ;; :: Set Todo keywords
+    ;;(setq org-todo-keywords
+    ;;      '((sequence "TODO" "WAIT" "VERIFY" "|" "DONE" "DELEGATED")))
+    ;;(setq org-todo-keyword-faces
+    ;; '(("IN-PROGRESS" . "orange") ("WAIT" . "yellow") ("CANCELED" . "red") ("DO" . "green"))
+    ;; )
 
-   ;; Org styling, hide markup etc.
-   org-hide-emphasis-markers t
-   org-pretty-entities t
-   org-ellipsis "…"
+    (setq
+     ;; Edit settings
+     org-auto-align-tags nil
+     org-tags-column 0
+     org-catch-invisible-edits 'show-and-error
+     org-special-ctrl-a/e t
+     org-insert-heading-respect-content t
 
-   ;; Agenda styling
-   org-agenda-block-separator ?─
-   org-agenda-time-grid
-   '((daily today require-timed)
-     (800 1000 1200 1400 1600 1800 2000)
-     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
-   org-agenda-current-time-string
-   "⭠ now ─────────────────────────────────────────────────")
+     ;; Org styling, hide markup etc.
+     org-hide-emphasis-markers t
+     org-pretty-entities t
+     org-ellipsis "…"
 
-  ;; Set timestamp on TODO create
-  ;;(setq org-treat-insert-todo-heading-as-state-change t)
-  (defun my/log-todo-creation-date (&rest ignore)
-    "Log TODO creation time in the property drawer under the key 'CREATED'."
-    (when (and (org-get-todo-state)
-               (not (org-entry-get nil "CREATED")))
-      (org-entry-put nil "CREATED" (format-time-string (cdr org-time-stamp-formats)))))
-  (advice-add 'org-insert-todo-heading :after #'my/log-todo-creation-date)
-  (advice-add 'org-insert-todo-heading-respect-content :after #'my/log-todo-creation-date)
-  (advice-add 'org-insert-todo-subheading :after #'my/log-todo-creation-date)
-  (add-hook 'org-after-todo-state-change-hook #'my/log-todo-creation-date)
-  ;; Setup agenda command to show completed tasks
-  ;; https://emacs.stackexchange.com/questions/52994/org-mode-agenda-show-list-of-tasks-done-in-the-past-and-not-those-clocked
-  (setq org-agenda-custom-commands
-        '(("W" "Weekly review with archives"
-           agenda ""
-           ((org-agenda-start-day "-6d")
-            (org-agenda-span 14)
-            (org-agenda-start-on-weekday 1)
-            (org-agenda-archives-mode t)
-            (org-agenda-start-with-log-mode t)
-            (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp "^\\*\\* DONE "))))
-          ("R" "Weekly review"
-           agenda ""
-           ((org-agenda-start-day "-6d")
-            (org-agenda-span 14)
-            (org-agenda-start-on-weekday 1)
-            (org-agenda-start-with-log-mode '(closed))
-            (org-agenda-archives-mode t)
-            (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp "^\\*\\* DONE "))))
-          ("n" "Agenda and all TODOs"
-           agenda ""
-           ((alltodo "")))
-          ))
-  ;; :: Set fancy todo states
-  ;;(setq org-todo-keywords '((sequence "☛ TODO(t)" "|" "<img draggable="false" role="img" class="emoji" alt="✔" src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/svg/2714.svg"> DONE(d)")
-  ;;(sequence "⚑ WAITING(w)" "|")
-  ;;(sequence "|" "✘ CANCELED(c)")))
-  ;; :: Set Color coding for @ contexts
-  ;; https://stackoverflow.com/questions/40876294/color-tags-based-on-regex-emacs-org-mode/40918994#40918994
-  ;; :: Set agenda key bindings
+     ;; Agenda styling
+     org-agenda-block-separator ?─
+     org-agenda-time-grid
+     '((daily today require-timed)
+       (800 1000 1200 1400 1600 1800 2000)
+       " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+     org-agenda-current-time-string
+     "⭠ now ─────────────────────────────────────────────────")
 
-  ;; :: ORG ROAM
-  ;;(setq org-roam-directory (file-truename "~/Dropbox/org"))
+    ;; Set timestamp on TODO create
+    ;;(setq org-treat-insert-todo-heading-as-state-change t)
+    (defun my/log-todo-creation-date (&rest ignore)
+      "Log TODO creation time in the property drawer under the key 'CREATED'."
+      (when (and (org-get-todo-state)
+		 (not (org-entry-get nil "CREATED")))
+	(org-entry-put nil "CREATED" (format-time-string (cdr org-time-stamp-formats)))))
+    (advice-add 'org-insert-todo-heading :after #'my/log-todo-creation-date)
+    (advice-add 'org-insert-todo-heading-respect-content :after #'my/log-todo-creation-date)
+    (advice-add 'org-insert-todo-subheading :after #'my/log-todo-creation-date)
+    (add-hook 'org-after-todo-state-change-hook #'my/log-todo-creation-date)
+    ;; Setup agenda command to show completed tasks
+    ;; https://emacs.stackexchange.com/questions/52994/org-mode-agenda-show-list-of-tasks-done-in-the-past-and-not-those-clocked
+    (setq org-agenda-custom-commands
+	  '(("W" "Weekly review with archives"
+	     agenda ""
+	     ((org-agenda-start-day "-6d")
+	      (org-agenda-span 14)
+	      (org-agenda-start-on-weekday 1)
+	      (org-agenda-archives-mode t)
+	      (org-agenda-start-with-log-mode t)
+	      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp "^\\*\\* DONE "))))
+	    ("R" "Weekly review"
+	     agenda ""
+	     ((org-agenda-start-day "-6d")
+	      (org-agenda-span 14)
+	      (org-agenda-start-on-weekday 1)
+	      (org-agenda-start-with-log-mode '(closed))
+	      (org-agenda-archives-mode t)
+	      (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp "^\\*\\* DONE "))))
+	    ("n" "Agenda and all TODOs"
+	     agenda ""
+	     ((alltodo "")))
+	    ))
+    ;; :: Set fancy todo states
+    ;;(setq org-todo-keywords '((sequence "☛ TODO(t)" "|" "<img draggable="false" role="img" class="emoji" alt="✔" src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/svg/2714.svg"> DONE(d)")
+    ;;(sequence "⚑ WAITING(w)" "|")
+    ;;(sequence "|" "✘ CANCELED(c)")))
+    ;; :: Set Color coding for @ contexts
+    ;; https://stackoverflow.com/questions/40876294/color-tags-based-on-regex-emacs-org-mode/40918994#40918994
+    ;; :: Set agenda key bindings
 
-  ;; (use-package org-roam
-  ;;   :custom
-  ;;   (org-roam-directory "~/Dropbox/org/")
-  ;;   
-  ;;   (org-roam-capture-templates
-  ;;    '(("d" "default" plain
-  ;;       #'org-roam-capture--get-point "%?"
-  ;;       :target (file+head "pages/${slug}.org"
-  ;;                          "#+title: ${title}\n")
-  ;;       :unnarrowed t))))
-  ;; (org-roam-setup)
+    ;; :: ORG ROAM
+    ;;(setq org-roam-directory (file-truename "~/Dropbox/org"))
 
-  ;; ==================================
-  ;; Org-roam mode!
+    ;; (use-package org-roam
+    ;;   :custom
+    ;;   (org-roam-directory "~/Dropbox/org/")
+    ;;   
+    ;;   (org-roam-capture-templates
+    ;;    '(("d" "default" plain
+    ;;       #'org-roam-capture--get-point "%?"
+    ;;       :target (file+head "pages/${slug}.org"
+    ;;                          "#+title: ${title}\n")
+    ;;       :unnarrowed t))))
+    ;; (org-roam-setup)
 
-  (defun roygbyte/org-roam-tia--entry ()
-    (prog1 (concat "* Today I Achieved: %? \n"
-                   ":PROPERTIES:\n"
-                   ;; Add file tags
-                   ":END:\n")))
+    ;; ==================================
+    ;; Org-roam mode!
 
-  ;; (concat ":ID: " (org-id-new) "\n")
+    (defun roygbyte/org-roam-tia--entry ()
+      (prog1 (concat "* Today I Achieved: %? \n"
+		     ":PROPERTIES:\n"
+		     ;; Add file tags
+		     ":END:\n")))
 
-  ;; So the issue with my template is that the template string passed to the ... template (?) needs to be a file
+    ;; (concat ":ID: " (org-id-new) "\n")
+
+    ;; So the issue with my template is that the template string passed to the ... template (?) needs to be a file
 
 
-  ;;(setq org-roam-dailies-directory "journals/")
+    ;;(setq org-roam-dailies-directory "journals/")
 
 #+end_src
+
+#+RESULTS:
+: roygbyte/org-roam-tia--entry
 
 
 ** Org-mode
@@ -190,8 +202,159 @@ uaoe
         (org-roam-dailies-capture-templates
           '(("d" "default" entry "* %<%I:%M %p>: %?"
              :if-new (file+head "%<%Y_%m_%d>.org" "#+title: %<%Y-%m-%d>\n"))
-            ("t" "TIA" entry (file "~/Development/_Emacs/dotemacs/snippets/org/roam-entry-tia.org")
+            ("t" "TIA" entry (file "~/Development/_Emacs/emacs/snippets/org/roam-entry-tia.org")
              :if-new (file+head "%<%Y_%m_%d>.org" "#+title: %<%Y-%m-%d>\n" )))))
 #+end_src
+
+#+RESULTS:
+
+#+begin_src emacs-lisp
+	;;   ;;----------------------------------------------------------------------
+	;; ;; Picking up TODO items from org-roam notes
+	;; ;; Via https://magnus.therning.org/2021-03-14-keeping-todo-items-in-org-roam.html
+
+	;; (defun roam-extra:todo-p ()
+	;;   "Return non-nil if current buffer has any TODO entry.
+
+	;; TODO entries marked as done are ignored, meaning the this
+	;; function returns nil if current buffer contains only completed
+	;; tasks."
+	;;   (org-element-map
+	;;       (org-element-parse-buffer 'headline)
+	;;       'headline
+	;;     (lambda (h)
+	;;       (eq (org-element-property :todo-type h)
+	;;           'todo))
+	;;     nil 'first-match))
+
+	;; (defun roam-extra:update-todo-tag ()
+	;;   "Update TODO tag in the current buffer."
+	;;   (when (and (not (active-minibuffer-window))
+	;;              (org-roam--org-file-p buffer-file-name))
+	;;     (let* ((file (buffer-file-name (buffer-base-buffer)))
+	;;            (all-tags (org-roam--extract-tags file))
+	;;            (prop-tags (org-roam--extract-tags-prop file))
+	;;            (tags prop-tags))
+	;;       (if (roam-extra:todo-p)
+	;;           (setq tags (seq-uniq (cons "todo" tags)))
+	;;         (setq tags (remove "todo" tags)))
+	;;       (unless (equal prop-tags tags)
+	;;         (org-roam--set-global-prop
+	;;          "roam_tags"
+	;;          (combine-and-quote-strings tags))))))
+
+
+	;; (defun roam-extra:todo-files ()
+	;;   "Return a list of note files containing todo tag."
+	;;   (seq-map
+	;;    #'car
+	;;    (org-roam-db-query
+	;;     [:select file
+	;;              :from tags
+	;;              :where (like tags (quote "%\"todo\"%"))])))
+
+
+	;; (defvar roam-extra-original-org-agenda-files nil
+	;;   "Original value of  `org-agenda-files'.")
+	;; (defun roam-extra:update-todo-files (&rest _)
+	;;   "Update the value of `org-agenda-files'."
+	;;   (unless roam-extra-original-org-agenda-files
+	;;     (setq roam-extra-original-org-agenda-files org-agenda-files))
+	;;   (setq org-agenda-files (append roam-extra-original-org-agenda-files (roam-extra:todo-files))))
+
+
+	;; ;; To ensure that the todo tag is correct in all org-mode files I've
+	;; ;; added roam-extra:update-todo-tag to hooks that are invoked on
+	;; ;; opening an org-ram file and when saving a file. (I would love to
+	;; ;; find a more specialise hook than before-save-hook, but it works for
+	;; ;; now.)
+	;; (add-hook 'org-roam-file-setup-hook #'roam-extra:update-todo-tag)
+	;; (add-hook 'before-save-hook #'roam-extra:update-todo-tag)
+
+	;; ;; To ensure that the list of files with TODO items is kept up to date
+	;; ;; when I open I also wrap org-agenda in an advice so
+	;; ;; roam-extra:update-todo-files is called prior to the agenda being
+	;; ;; opened.
+	;; (advice-add 'org-agenda :before #'roam-extra:update-todo-files)
+
+  (use-package vulpea
+    :ensure t
+    ;; hook into org-roam-db-autosync-mode you wish to enable
+    ;; persistence of meta values (see respective section in README to
+    ;; find out what meta means)
+    :hook ((org-roam-db-autosync-mode . vulpea-db-autosync-enable)))
+
+      (defun vulpea-project-p ()
+	"Return non-nil if current buffer has any todo entry.
+
+      TODO entries marked as done are ignored, meaning the this
+      function returns nil if current buffer contains only completed
+      tasks."
+	(seq-find                                 ; (3)
+	 (lambda (type)
+	   (eq type 'todo))
+	 (org-element-map                         ; (2)
+	     (org-element-parse-buffer 'headline) ; (1)
+	     'headline
+	   (lambda (h)
+	     (org-element-property :todo-type h)))))
+
+    (defun vulpea-buffer-tags-get ()
+      "Return filetags value in current buffer."
+      (vulpea-buffer-prop-get-list
+     "filetags" " "))
+
+      (defun vulpea-project-update-tag ()
+	  "Update PROJECT tag in the current buffer."
+	  (when (and (not (active-minibuffer-window))
+		     (vulpea-buffer-p))
+	    (save-excursion
+	      (goto-char (point-min))
+	      (let* ((tags (vulpea-buffer-tags-get))
+		     (original-tags tags))
+		;; this is broken. It 
+		;; (if (vulpea-project-p)
+		;; 	  (setq tags (cons "project" tags))
+		;; 	(setq tags (remove "project" tags)))
+		;; cleanup duplicates
+		;; well actually this is broken. it doesn't remove dupes. I think tags is
+		(setq tags (seq-uniq tags))
+		;; update tags if changed
+		(when (or (seq-difference tags original-tags)
+			  (seq-difference original-tags tags))
+		  (apply #'vulpea-buffer-tags-set tags))))))
+
+      (defun vulpea-buffer-p ()
+	"Return non-nil if the currently visited buffer is a note."
+	(and buffer-file-name
+	     (string-prefix-p
+	      (expand-file-name (file-name-as-directory org-roam-directory))
+	      (file-name-directory buffer-file-name))))
+
+      (defun vulpea-project-files ()
+	  "Return a list of note files containing 'project' tag." ;
+	  (seq-uniq
+	   (seq-map
+	    #'car
+	    (org-roam-db-query
+	     [:select [nodes:file]
+	      :from tags
+	      :left-join nodes
+	      :on (= tags:node-id nodes:id)
+	      :where (like tag (quote "%\"project\"%"))]))))
+
+      (defun vulpea-agenda-files-update (&rest _)
+	"Update the value of `org-agenda-files'."
+	(setq org-agenda-files (vulpea-project-files)))
+
+      (add-hook 'find-file-hook #'vulpea-project-update-tag)
+      (add-hook 'before-save-hook #'vulpea-project-update-tag)
+
+      (advice-add 'org-agenda :before #'vulpea-agenda-files-update)
+      (advice-add 'org-todo-list :before #'vulpea-agenda-files-update)
+
+#+end_src
+
+#+RESULTS:
 
 ** Org-agenda
